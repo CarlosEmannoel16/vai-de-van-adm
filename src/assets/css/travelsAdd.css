@@ -1,0 +1,23 @@
+.TravelAdd {
+  padding: 20px;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  cursor: pointer;
+}
+.TravelAdd:hover {
+   opacity: 1;
+  }
+.leftTimeLineIcon{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  cursor: pointer;
+}
