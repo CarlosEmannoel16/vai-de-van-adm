@@ -103,15 +103,15 @@ function TravelList() {
                         <tr
                           style={{ cursor: "pointer" }}
                           key={index}
-                          onClick={() => {
-                            navigate(`/add/travel`);
-                          }}
+                         
                         >
                           <td>{driver.id}</td>
                           <td>{formatDateToDisplay(driver.departureDate)}</td>
                           <td>{driver.Driver.User.name}</td>
                           <td>{driver.Vechicle.description}</td>
-                          <td className="text-right">Editar</td>
+                          <td className="text-right" onClick={()=>{
+                            navigate(`/add/travel/${driver.id}`);
+                          }}>Editar</td>
                         </tr>
                       ))}
                     </tbody>

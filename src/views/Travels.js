@@ -16,7 +16,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as yup from "yup";
 // reactstrap components
 import {
@@ -45,6 +45,7 @@ import { toast } from "react-toastify";
 import { userService } from "services/driver";
 import { serviceVehicles } from "services/vehicle";
 import { travelService } from "services/travel";
+import { useParams } from "react-router-dom";
 //import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function Travel() {
   const [routes, setRoutes] = useState([]);
@@ -54,8 +55,22 @@ function Travel() {
   const [dataToForm, setDataToForm] = useState({});
   const [drivers, setDrivers] = useState([]);
   const [vehicles, setVehicle] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const {id} = useParams()
+
+  useEffect(() => {
+
+    if(id){
+      travelService.getById(id).then((res) => {
+        
+      });
+    }
+  }, [id])
+
 
   const handleButtonAddPitStop = () => {
+
+
     if (pitStops.length === 0) {
       toast.warning("Selecione uma rota");
       return;
@@ -115,7 +130,7 @@ function Travel() {
   const onSubmit = async (e) => {
     try {
       e.preventDefault();
-
+      setLoading(true)
       await yup
         .object()
         .shape({
@@ -136,17 +151,20 @@ function Travel() {
         }
       });
 
-      console.log(dataToForm);
-      console.log(pitStops);
 
       travelService
         .create({ ...dataToForm, tripStops: pitStops })
-        .then((res) => {})
+        .then((res) => {
+          setLoading(false)
+          toast.success("Viagem cadastrada com sucesso");
+        })
         .catch((e) => {
+          setLoading(false)
           toast.error(e.message);
         });
     } catch (error) {
       toast.error(error.message);
+      setLoading(false)
     }
   };
 
@@ -197,7 +215,7 @@ function Travel() {
       <div className="content">
         <Card className="card-user">
           <CardHeader>
-            <CardTitle tag="h5">Cadastro de Viagens</CardTitle>
+            <CardTitle tag="h5"> {!!id ? 'Edicao de Viagem' : 'Cadastro de Viagem'}</CardTitle>
           </CardHeader>
           <CardBody>
             <Form onSubmit={onSubmit}>
@@ -324,7 +342,7 @@ function Travel() {
 
               <Row>
                 <div className="update ml-auto mr-auto">
-                  <Button className="btn-round" color="primary" type="submit">
+                  <Button className="btn-round" color="primary" type="submit" disabled={loading}>
                     Salvar
                   </Button>
                 </div>

@@ -47,15 +47,13 @@ function Sidebar(props) {
     };
   });
   return (
-    <div
-      className="sidebar"
-      data-color={props.bgColor}
-      data-active-color={props.activeColor}
-    >
-      <div className="logo">
-        <h3>Vai de Havan</h3>
-      </div>
-      <div className="sidebar-wrapper" ref={sidebar}>
+    <div className="sidebar" >
+
+     <div className="logo" style={{backgroundColor: '#320d6d', display:'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>
+      <img src={logo} alt="..." style={{width: '50px', height: '50px'}}/>
+      <p style={{color: 'white', fontSize: '20px', fontWeight: 'bold'}}>Vai de Van</p>
+      </div>  
+      <div className="sidebar-wrapper" ref={sidebar}  style={{backgroundColor: '#320d6d'}}>
         <Nav>
           {props.routes.map((prop, key) => {
             if (prop.display === false) return null;

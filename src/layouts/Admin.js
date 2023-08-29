@@ -62,8 +62,8 @@ function Dashboard(props) {
       <Sidebar
         {...props}
         routes={routes}
-        bgColor={"#1E3888"}
-        activeColor={"#1E3888"}
+        bgColor={"#ffbc42"}
+        //activeColor={"#ffbc42"}
       />
       <div className="main-panel" ref={mainPanel}>
         <DemoNavbar {...props} />

@@ -13,6 +13,12 @@ class TravelService {
       headers: { Authorization: `Bearer ${getTokenUserLocal()}` },
     });
   }
+
+  async getById(id) {
+    return await axios.get(`${config.baseUrl}/travel/${id}`, {
+      headers: { Authorization: `Bearer ${getTokenUserLocal()}` },
+    });
+  }
 }
 
 export const travelService = new TravelService();

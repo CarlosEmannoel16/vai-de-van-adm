@@ -1,4 +1,4 @@
-import { MutatingDots } from "react-loader-spinner";
+import { MutatingDots,Dna } from "react-loader-spinner";
 
 export const Loader = () => {
   return (
@@ -11,7 +11,7 @@ export const Loader = () => {
         alignItems: "center",
       }}
     >
-      <MutatingDots
+      <Dna
         height="100"
         width="100"
         color="#4fa94d"
