@@ -16,7 +16,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // reactstrap components
 import {
@@ -32,9 +32,12 @@ import { useNavigate } from "react-router-dom";
 import { routerService } from "services/routers";
 import { Loader } from "components/Loader/Loader";
 
+
+
 function RoutesList() {
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState([]);
+
 
   useState(() => {
     if (!routes.length) {
@@ -99,12 +102,14 @@ function RoutesList() {
                           style={{ cursor: "pointer" }}
                           key={index}
                           onClick={() => {
-                            navigate(`/admin/add/driver`);
+                            navigate(`/add/route`, {
+                              state: { route: routeCurrent },
+                            });
                           }}
                         >
                           <td>{routeCurrent.name}</td>
-                          <td>{routeCurrent.name}</td>
-                          <td>{routeCurrent.name}</td>
+                          <td>{routeCurrent.Origin.name}</td>
+                          <td>{routeCurrent.Destiny.name}</td>
                           <td>{routeCurrent.km} Km</td>
                           <td className="text-right">Editar</td>
                         </tr>

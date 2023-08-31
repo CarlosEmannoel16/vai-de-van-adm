@@ -1,4 +1,4 @@
-import { MutatingDots,Dna } from "react-loader-spinner";
+import { MutatingDots,Dna,Watch, Rings, MagnifyingGlass } from "react-loader-spinner";
 
 export const Loader = () => {
   return (
@@ -11,10 +11,10 @@ export const Loader = () => {
         alignItems: "center",
       }}
     >
-      <Dna
+      <MagnifyingGlass
         height="100"
         width="100"
-        color="#4fa94d"
+        color="#320D6D"
         secondaryColor="#4fa94d"
         radius="12.5"
         ariaLabel="mutating-dots-loading"

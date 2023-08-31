@@ -99,18 +99,20 @@ function TravelList() {
                     </thead>
 
                     <tbody>
-                      {travel.map((driver, index) => (
+                      {travel.map((travelCurrent, index) => (
                         <tr
                           style={{ cursor: "pointer" }}
                           key={index}
                          
                         >
-                          <td>{driver.id}</td>
-                          <td>{formatDateToDisplay(driver.departureDate)}</td>
-                          <td>{driver.Driver.User.name}</td>
-                          <td>{driver.Vechicle.description}</td>
+                          <td>{travelCurrent?.description}</td>
+                          <td>{formatDateToDisplay(travelCurrent.departureDate)}</td>
+                          <td>{travelCurrent.Driver.User.name}</td>
+                          <td>{travelCurrent.Vechicle.description}</td> 
                           <td className="text-right" onClick={()=>{
-                            navigate(`/add/travel/${driver.id}`);
+                            navigate(`/add/travel`, {
+                              state: { travel: travelCurrent },
+                            });
                           }}>Editar</td>
                         </tr>
                       ))}

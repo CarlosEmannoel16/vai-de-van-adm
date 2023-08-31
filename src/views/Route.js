@@ -36,14 +36,16 @@ import {
 } from "reactstrap";
 import { cityService } from "services/city";
 import { routerService } from "services/routers";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 function Route() {
   const [cities, setCities] = React.useState([]);
   const [ticketValue, setTicketValue] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [formSubmit, setFormSubmit] = useState({});
-  const { id } = useParams();
+
+  const location = useLocation()
+  console.log('1==>', location.state)
   useEffect(() => {
     setLoading(true);
     if (!cities.length) {
@@ -60,7 +62,19 @@ function Route() {
     }
   }, [formSubmit]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (location.state?.route && !Object.keys(formSubmit).length) {
+      setFormSubmit({
+        name: location.state.route.name,
+        origin: location.state.route.originId,
+        detiny: location.state.route.destinyId,
+        km: location.state.route.km,
+        kmValue: location.state.route.kmValue,
+      })
+      console.log('2==>', formSubmit)
+      setLoading(false)
+    }
+  }, [location.state?.route]);
 
   const onsubmit = (e) => {
     try {
@@ -68,13 +82,13 @@ function Route() {
       Yup.object({
         name: Yup.string().required("Nome é obrigatório"),
         origin: Yup.string().required("Cidade de origem é obrigatório"),
-        detiny: Yup.string().required("Cidade de destino é obrigatório"),
+        destiny: Yup.string().required("Cidade de destino é obrigatório"),
         km: Yup.number().required("Distancia é obrigatório"),
         kmValue: Yup.number().required("Valor do KM é obrigatório"),
       }).validateSync(formSubmit, { abortEarly: true });
 
       console.log({
-        destinyId: formSubmit.detiny,
+        destinyId: formSubmit.destiny,
         km: formSubmit.km,
         name: formSubmit.name,
         originId: formSubmit.origin,
@@ -83,7 +97,7 @@ function Route() {
       });
       routerService
         .create({
-          destinyId: formSubmit.detiny,
+          destinyId: formSubmit.destiny,
           km: formSubmit.km,
           name: formSubmit.name,
           originId: formSubmit.origin,
@@ -118,7 +132,7 @@ function Route() {
                       <FormGroup>
                         <label>Nome</label>
                         <Input
-                          defaultValue=""
+                          defaultValue={formSubmit.name || ""}
                           placeholder="Nome"
                           type="text"
                           onChange={(e) => {
@@ -136,6 +150,7 @@ function Route() {
                         <Input
                           id="exampleSelect"
                           name="origin"
+                          defaultValue={formSubmit?.origin || ""}
                           type="select"
                           onChange={(e) => {
                             setFormSubmit({
@@ -144,8 +159,12 @@ function Route() {
                             });
                           }}
                         >
+                          <option value={formSubmit?.destiny || ''}>{location.state?.route.Origin.name || 'Selecionar Uma Origem'}</option>
+
                           {cities.map((city) => (
-                            <option value={city.id}>{city.name}</option>
+                            <option selected={() => {
+                              return city.id === formSubmit?.origin
+                            }} value={city.id}>{city.name}</option>
                           ))}
                         </Input>
                       </FormGroup>
@@ -156,14 +175,18 @@ function Route() {
                         <Input
                           id="exampleSelect"
                           name="destiny"
+                          defaultValue={formSubmit?.destiny || ""}
+
                           type="select"
                           onChange={(e) => {
                             setFormSubmit({
                               ...formSubmit,
-                              detiny: e.target.value,
+                              destiny: e.target.value,
                             });
                           }}
                         >
+                          <option value={formSubmit?.origin || ''}>{location.state?.route.Destiny.name || 'Selecionar Um Destino'}</option>
+
                           {cities.map((city) => (
                             <option value={city.id}>{city.name}</option>
                           ))}
@@ -176,7 +199,7 @@ function Route() {
                       <FormGroup>
                         <label>Distancia</label>
                         <Input
-                          defaultValue=""
+                          defaultValue={formSubmit?.km || ""}
                           placeholder="80"
                           name="km"
                           type="number"
@@ -193,8 +216,8 @@ function Route() {
                       <FormGroup>
                         <label>Valor do KM</label>
                         <Input
-                          defaultValue=""
-                          placeholder="R$ 0.70"
+                          defaultValue={formSubmit?.kmValue || ""}
+                          placeholder="ex: 0.7"
                           type="text"
                           onChange={(e) => {
                             setFormSubmit({
@@ -211,7 +234,7 @@ function Route() {
                         <Input
                           defaultValue=""
                           disabled
-                          placeholder="0,00"
+                          placeholder="R$:0,00"
                           type="text"
                           name="ticketValue"
                           value={ticketValue}

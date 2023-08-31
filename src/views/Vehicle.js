@@ -38,24 +38,17 @@ import { serviceVehicles } from "services/vehicle";
 import { useNavigate, useParams } from "react-router-dom";
 
 function Vehicle() {
-  // id                String   @id @default(uuid())
-  // amount_of_accents Int
-  // plate             String
-  // with_air          Boolean
-  // Travel            Travel[]
-  // cor               String
-  // created_at        DateTime @default(now())
-  // update_at         DateTime @default(now()) @updatedAt
-  // Owner             User     @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  // ownerId
+ 
   const [formSubmit, setFormSubmit] = useState({ with_air: true });
   const [drivers, setDriver] = useState([]);
   const [isUpdate, setIsUpdate] = useState(false);
   const [vehicle, setVehicle] = useState({});
+  const [loading, setLoading] = useState(false); // [1
   const params = useParams();
   const navigate = useNavigate();
   const onsubmit = (e) => {
     try {
+      setLoading(true);
       Yup.object({
         description: Yup.string().required("Descrição é obrigatório"),
         plate: Yup.string().required("Placa é obrigatório"),
@@ -77,6 +70,7 @@ function Vehicle() {
             setTimeout(() => {
               navigate(`/list/vehicles`);
             }, 1000);
+            setLoading(false);
           });
       } else {
         serviceVehicles
@@ -89,9 +83,11 @@ function Vehicle() {
             setTimeout(() => {
               navigate(`/list/vehicles`);
             }, 1000);
+            setLoading(false);
           });
       }
     } catch (error) {
+      setLoading(false);
       toast.error(error.message);
     }
     e.preventDefault();
@@ -99,26 +95,29 @@ function Vehicle() {
 
   useState(() => {
     if (!drivers.length) {
+      setLoading(true);
       userService
         .getAll()
         .then((res) => {
           setDriver(res.data.data);
+          setLoading(false);
         })
         .catch(() => {
           toast.error("Erro ao buscar motoristas");
+          setLoading(false);
         });
     }
   }, [drivers]);
 
   useEffect(() => {
-    console.log(params);
+    
     if (params?.id) {
+      setLoading(true);
       serviceVehicles
         .getById(params.id)
         .then((res) => {
           setIsUpdate(true);
-          setVehicle(res.data);
-          console.log(res.data);
+          setVehicle(res.data);  console.log(res.data);
           setFormSubmit({
             id: res.data.id || "",
             description: res.data.description || "",
@@ -128,8 +127,10 @@ function Vehicle() {
             ownerId: res.data.ownerId || "",
             with_air: res.data.with_air || true,
           });
+          setLoading(false);
         })
         .catch(() => {
+          setLoading(false);
           toast.error("Erro ao buscar veiculo");
         });
     }
@@ -275,6 +276,7 @@ function Vehicle() {
                         className="btn-round"
                         color="primary"
                         type="submit"
+                        disabled={loading}
                       >
                         {Object.keys(vehicle).length ? "Editar" : "Adicionar"}
                       </Button>

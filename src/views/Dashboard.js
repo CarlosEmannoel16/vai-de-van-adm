@@ -16,7 +16,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 // react plugin used to create charts
 import { Line, Pie } from "react-chartjs-2";
 // reactstrap components
@@ -29,6 +29,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import { dashboardService } from "services/dashboard";
 // core components
 import {
   dashboard24HoursPerformanceChart,
@@ -37,6 +38,17 @@ import {
 } from "variables/charts.js";
 
 function Dashboard() {
+
+  const [dashboard, setDashboard] = React.useState({});
+
+  useState(() => {
+    if(!Object.keys(dashboard).length)
+    dashboardService.find().then((response) => {
+     console.log(';;',response.data)
+      setDashboard(response.data.data);
+    });
+    console.log(dashboard)
+  }, [dashboard]);
   return (
     <>
       <div className="content">
@@ -53,7 +65,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Número Veiculos</p>
-                      <CardTitle tag="p">154</CardTitle>
+                      <CardTitle tag="p">{dashboard.countVehicle}</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -79,7 +91,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Receita</p>
-                      <CardTitle tag="p">R$ 1.345</CardTitle>
+                      <CardTitle tag="p">R$ 0,00</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -105,7 +117,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Passagens Vendidas</p>
-                      <CardTitle tag="p">23</CardTitle>
+                      <CardTitle tag="p">0</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -120,6 +132,7 @@ function Dashboard() {
             </Card>
           </Col>
         </Row>
+        
         <Row>
           <Col md="12">
             <Card>
@@ -134,10 +147,10 @@ function Dashboard() {
                   width={400}
                   height={100}
                 />
-              </CardBody>
+              </CardBody>  
               <CardFooter>
                 <hr />
-                <div className="stats">
+                <div className="stats"> 
                   <i className="fa fa-history" /> Updated 3 minutes ago
                 </div>
               </CardFooter>

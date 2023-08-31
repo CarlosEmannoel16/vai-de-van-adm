@@ -45,7 +45,7 @@ import { toast } from "react-toastify";
 import { userService } from "services/driver";
 import { serviceVehicles } from "services/vehicle";
 import { travelService } from "services/travel";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 //import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function Travel() {
   const [routes, setRoutes] = useState([]);
@@ -56,21 +56,29 @@ function Travel() {
   const [drivers, setDrivers] = useState([]);
   const [vehicles, setVehicle] = useState([]);
   const [loading, setLoading] = useState(false);
-  const {id} = useParams()
+
+  const location = useLocation()
+  console.log('1==>', location.state)
 
   useEffect(() => {
-
-    if(id){
-      travelService.getById(id).then((res) => {
-        
-      });
+    if (location.state.travel && !Object.keys(dataToForm).length) {
+      console.log('setendo')
+      setDataToForm({
+        ...location.state.travel,
+      })
+      let pitStops = [...location.state.travel.TripStops]
+      pitStops[0] = {
+        ...pitStops[0],
+        fixed: true,
+      }
+      setPitStops(pitStops)
+      
+    
     }
-  }, [id])
+  }, [location.state.travel])
 
 
   const handleButtonAddPitStop = () => {
-
-
     if (pitStops.length === 0) {
       toast.warning("Selecione uma rota");
       return;
@@ -215,7 +223,7 @@ function Travel() {
       <div className="content">
         <Card className="card-user">
           <CardHeader>
-            <CardTitle tag="h5"> {!!id ? 'Edicao de Viagem' : 'Cadastro de Viagem'}</CardTitle>
+            <CardTitle tag="h5"> {!!location.state.travel ? 'Edicao de Viagem' : 'Cadastro de Viagem'}</CardTitle>
           </CardHeader>
           <CardBody>
             <Form onSubmit={onSubmit}>
@@ -224,8 +232,8 @@ function Travel() {
                   <FormGroup>
                     <label>Nome</label>
                     <Input
-                      defaultValue=""
-                      placeholder="Descricao da rota"
+                      defaultValue={dataToForm?.description || ""}
+                      placeholder="Descricao da Viagem"
                       onChange={(e) =>
                         setDataToForm({
                           ...dataToForm,
@@ -243,10 +251,14 @@ function Travel() {
                       id="idRoute"
                       name="idRoute"
                       type="select"
+                      defaultValue={JSON.stringify(dataToForm?.Route)}
                       onChange={(e) => {
                         handleSelectRouter(e.target.value);
                       }}
                     >
+                      <option key={897986} value={JSON.stringify(dataToForm?.Route)}>
+                        {dataToForm?.Route?.name || 'Selecionar Uma Rota'}
+                      </option>
                       {routes.length &&
                         routes.map((route, index) => (
                           <option key={index} value={JSON.stringify(route)}>
@@ -264,6 +276,7 @@ function Travel() {
                       name="driverId"
                       type="select"
                       placeholder="Digite o Nome do Motorista"
+                      defaultValue={dataToForm?.Driver?.User?.id}
                       onChange={(e) =>
                         setDataToForm({
                           ...dataToForm,
@@ -271,6 +284,9 @@ function Travel() {
                         })
                       }
                     >
+                      <option key={897986} value={dataToForm?.Driver?.User?.id}>
+                        {dataToForm?.Driver?.User?.name || 'Selecionar Um Motorista'}
+                      </option>
                       {drivers.length &&
                         drivers.map((driver) => {
                           if (driver.User.Driver.length > 0)
@@ -285,12 +301,13 @@ function Travel() {
                 </Col>
               </Row>
               <Row>
-                <Col className="px-1" md="3">
+                <Col className="pr-1" md="3">
                   <FormGroup>
                     <Label for="exampleSelect">Veiculo</Label>
                     <Input
                       id="idVehicle"
                       name="idVehicle"
+                      defaultValue={dataToForm?.Vehicle?.id}
                       type="select"
                       onChange={(e) =>
                         setDataToForm({
@@ -299,6 +316,9 @@ function Travel() {
                         })
                       }
                     >
+                      <option key={897986} value={dataToForm?.Vechicle?.id}>
+                        {dataToForm?.Vechicle?.description || 'Selecionar Um Veiculo'}
+                      </option>
                       {vehicles.length &&
                         vehicles.map((vh) => {
                           return (
@@ -314,11 +334,13 @@ function Travel() {
                     <Input
                       id="departureDate"
                       type="date"
+                      defaultValue={dataToForm?.departureDate?.toString()?.substring(0, 10)}
                       onChange={(e) =>
                         setDataToForm({
                           ...dataToForm,
                           departureDate: e.target.value,
                         })
+                      
                       }
                     ></Input>
                   </FormGroup>
@@ -329,6 +351,7 @@ function Travel() {
                     <Input
                       id="arrivalDate"
                       type="date"
+                      defaultValue={dataToForm?.arrivalDate?.toString()?.substring(0, 10)}
                       onChange={(e) =>
                         setDataToForm({
                           ...dataToForm,
@@ -353,8 +376,10 @@ function Travel() {
 
         {pitStops.length > 0 &&
           pitStops.map((pitStop, index) => (
-            <Row>
-              <Col md="2">
+            <Row style={{
+              height: '250px',
+            }}>
+              <Col md="1">
                 <Card className="card-user">
                   <CardBody
                     style={{
@@ -384,13 +409,13 @@ function Travel() {
                       {pitStop.tripStopOrder === 0
                         ? "Origem"
                         : pitStop.tripStopOrder === 999
-                        ? "Destino"
-                        : ""}
+                          ? "Destino"
+                          : ""}
                     </span>
                   </CardBody>
                 </Card>
               </Col>
-              <Col md="10">
+              <Col md="11">
                 <Card className="card-user" style={{ minHeight: "30px" }}>
                   <CardBody>
                     <FormGroup>
@@ -422,8 +447,9 @@ function Travel() {
                       </Input>
                     </FormGroup>
                     {!pitStop.fixed ? (
-                      <Row style={{ marginLeft: "2px" }}>
-                        <Col className="pr-1" md="3"></Col>
+                      <Row  >
+
+
                         <Col className="pr-1" md="3">
                           <FormGroup>
                             <label>Distancia da ultima parada</label>
@@ -442,6 +468,19 @@ function Travel() {
                             />
                           </FormGroup>
                         </Col>
+                        <Col className="pr-1" md="3">
+                          <FormGroup>
+                            <label>Distancia da origem</label>
+                            <Input
+                              defaultValue=""
+                              placeholder="Km"
+                              type="text"
+                              disabled={true}
+
+                            />
+                          </FormGroup>
+                        </Col>
+                        <Col className="pr-1" md="6"></Col>
                       </Row>
                     ) : (
                       <></>
