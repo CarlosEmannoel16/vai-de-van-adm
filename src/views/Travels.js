@@ -45,7 +45,7 @@ import { toast } from "react-toastify";
 import { userService } from "services/driver";
 import { serviceVehicles } from "services/vehicle";
 import { travelService } from "services/travel";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 //import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function Travel() {
   const [routes, setRoutes] = useState([]);
@@ -57,26 +57,22 @@ function Travel() {
   const [vehicles, setVehicle] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const location = useLocation()
-  console.log('1==>', location.state)
-
+  const location = useLocation();
+  const navigate = useNavigate();
   useEffect(() => {
-    if (location.state.travel && !Object.keys(dataToForm).length) {
-      console.log('setendo')
+    if (location?.state?.travel && !Object.keys(dataToForm).length) {
+      console.log("setendo");
       setDataToForm({
-        ...location.state.travel,
-      })
-      let pitStops = [...location.state.travel.TripStops]
+        ...location.state?.travel,
+      });
+      let pitStops = [...location.state?.travel?.TripStops];
       pitStops[0] = {
         ...pitStops[0],
         fixed: true,
-      }
-      setPitStops(pitStops)
-      
-    
+      };
+      setPitStops(pitStops);
     }
-  }, [location.state.travel])
-
+  }, [location?.state?.travel]);
 
   const handleButtonAddPitStop = () => {
     if (pitStops.length === 0) {
@@ -138,7 +134,7 @@ function Travel() {
   const onSubmit = async (e) => {
     try {
       e.preventDefault();
-      setLoading(true)
+      setLoading(true);
       await yup
         .object()
         .shape({
@@ -154,25 +150,39 @@ function Travel() {
         });
 
       pitStops.map((pitStop) => {
-        if (pitStop.distanceFromLastStop === undefined && !pitStop.fixed) {
-          throw new Error("Distancia entre paradas é orbigatório");
+        if (!pitStop.distanceFromLastStop && !pitStop.fixed) {
+          throw new Error("Distancia entre paradas é obrigatório");
         }
       });
 
-
+      if (!location?.state?.travel) {
+        travelService
+          .create({ ...dataToForm, tripStops: pitStops })
+          .then((res) => {
+            setLoading(false);
+            toast.success("Viagem cadastrada com sucesso");
+            navigate("/travel");
+          })
+          .catch((e) => {
+            setLoading(false);
+            toast.error(e.message);
+          });
+        return;
+      }
       travelService
-        .create({ ...dataToForm, tripStops: pitStops })
+        .update({ ...dataToForm, tripStops: pitStops })
         .then((res) => {
-          setLoading(false)
-          toast.success("Viagem cadastrada com sucesso");
+          setLoading(false);
+          toast.success("Viagem Atualizada com sucesso");
+          navigate("/travel");
         })
         .catch((e) => {
-          setLoading(false)
+          setLoading(false);
           toast.error(e.message);
         });
     } catch (error) {
       toast.error(error.message);
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -223,7 +233,12 @@ function Travel() {
       <div className="content">
         <Card className="card-user">
           <CardHeader>
-            <CardTitle tag="h5"> {!!location.state.travel ? 'Edicao de Viagem' : 'Cadastro de Viagem'}</CardTitle>
+            <CardTitle tag="h5">
+              {" "}
+              {!!location.state?.travel
+                ? "Edicao de Viagem"
+                : "Cadastro de Viagem"}
+            </CardTitle>
           </CardHeader>
           <CardBody>
             <Form onSubmit={onSubmit}>
@@ -256,8 +271,11 @@ function Travel() {
                         handleSelectRouter(e.target.value);
                       }}
                     >
-                      <option key={897986} value={JSON.stringify(dataToForm?.Route)}>
-                        {dataToForm?.Route?.name || 'Selecionar Uma Rota'}
+                      <option
+                        key={897986}
+                        value={JSON.stringify(dataToForm?.Route)}
+                      >
+                        {dataToForm?.Route?.name || "Selecionar Uma Rota"}
                       </option>
                       {routes.length &&
                         routes.map((route, index) => (
@@ -285,7 +303,8 @@ function Travel() {
                       }
                     >
                       <option key={897986} value={dataToForm?.Driver?.User?.id}>
-                        {dataToForm?.Driver?.User?.name || 'Selecionar Um Motorista'}
+                        {dataToForm?.Driver?.User?.name ||
+                          "Selecionar Um Motorista"}
                       </option>
                       {drivers.length &&
                         drivers.map((driver) => {
@@ -317,7 +336,8 @@ function Travel() {
                       }
                     >
                       <option key={897986} value={dataToForm?.Vechicle?.id}>
-                        {dataToForm?.Vechicle?.description || 'Selecionar Um Veiculo'}
+                        {dataToForm?.Vechicle?.description ||
+                          "Selecionar Um Veiculo"}
                       </option>
                       {vehicles.length &&
                         vehicles.map((vh) => {
@@ -334,13 +354,14 @@ function Travel() {
                     <Input
                       id="departureDate"
                       type="date"
-                      defaultValue={dataToForm?.departureDate?.toString()?.substring(0, 10)}
+                      defaultValue={dataToForm?.departureDate
+                        ?.toString()
+                        ?.substring(0, 10)}
                       onChange={(e) =>
                         setDataToForm({
                           ...dataToForm,
                           departureDate: e.target.value,
                         })
-                      
                       }
                     ></Input>
                   </FormGroup>
@@ -351,7 +372,9 @@ function Travel() {
                     <Input
                       id="arrivalDate"
                       type="date"
-                      defaultValue={dataToForm?.arrivalDate?.toString()?.substring(0, 10)}
+                      defaultValue={dataToForm?.arrivalDate
+                        ?.toString()
+                        ?.substring(0, 10)}
                       onChange={(e) =>
                         setDataToForm({
                           ...dataToForm,
@@ -365,7 +388,12 @@ function Travel() {
 
               <Row>
                 <div className="update ml-auto mr-auto">
-                  <Button className="btn-round" color="primary" type="submit" disabled={loading}>
+                  <Button
+                    className="btn-round"
+                    color="primary"
+                    type="submit"
+                    disabled={loading}
+                  >
                     Salvar
                   </Button>
                 </div>
@@ -376,9 +404,11 @@ function Travel() {
 
         {pitStops.length > 0 &&
           pitStops.map((pitStop, index) => (
-            <Row style={{
-              height: '250px',
-            }}>
+            <Row
+              style={{
+                height: "250px",
+              }}
+            >
               <Col md="1">
                 <Card className="card-user">
                   <CardBody
@@ -409,8 +439,8 @@ function Travel() {
                       {pitStop.tripStopOrder === 0
                         ? "Origem"
                         : pitStop.tripStopOrder === 999
-                          ? "Destino"
-                          : ""}
+                        ? "Destino"
+                        : ""}
                     </span>
                   </CardBody>
                 </Card>
@@ -447,9 +477,7 @@ function Travel() {
                       </Input>
                     </FormGroup>
                     {!pitStop.fixed ? (
-                      <Row  >
-
-
+                      <Row>
                         <Col className="pr-1" md="3">
                           <FormGroup>
                             <label>Distancia da ultima parada</label>
@@ -476,7 +504,6 @@ function Travel() {
                               placeholder="Km"
                               type="text"
                               disabled={true}
-
                             />
                           </FormGroup>
                         </Col>

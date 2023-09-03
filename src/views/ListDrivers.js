@@ -18,7 +18,6 @@
 */
 import React, { useState } from "react";
 
-// reactstrap components
 import {
   Card,
   CardHeader,
@@ -27,10 +26,12 @@ import {
   Table,
   Row,
   Col,
+  Button,
 } from "reactstrap";
 import { userService } from "../services/driver";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "components/Loader/Loader";
+import { Paginations } from "components/Pagination/Pagination";
 
 function Tables() {
   const [drivers, setDrivers] = useState([]);
@@ -69,26 +70,18 @@ function Tables() {
                 }}
               >
                 <CardTitle tag="h4">Motoristas</CardTitle>
-                <CardTitle
-                  style={{ cursor: "pointer" }}
-                  tag="h3"
-                  onClick={() => {
-                    navigate(`/add/driver`);
-                  }}
-                >
-                  <i className="nc-icon nc-simple-add" />
-                </CardTitle>
+
+                <Button>Criar Novo</Button>
               </CardHeader>
 
               {!loading && drivers.length > 0 ? (
                 <CardBody>
                   <Table responsive>
-                    <thead className="text-primary">
+                    <thead color="#000">
                       <tr>
                         <th>Nome</th>
                         <th>Email</th>
                         <th>Telefone</th>
-                        <th className="text-right">Editar</th>
                       </tr>
                     </thead>
 
@@ -107,15 +100,20 @@ function Tables() {
                           <td
                             className="text-right"
                             onClick={() =>
-                              navigate(`/add/driver/${driver.User.id}`)
+                              navigate(`/add/driver`, { state: driver.User.id })
                             }
                           >
-                            Editar
+                            <Button color="primary">Editar</Button>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </Table>
+                  <Paginations
+                    totalPages={3}
+                    callback={() => {}}
+                    pageCurrent={0}
+                  />
                 </CardBody>
               ) : (
                 <Loader />

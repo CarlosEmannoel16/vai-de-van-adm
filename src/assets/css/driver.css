@@ -2,5 +2,13 @@
   cursor: pointer;
   opacity: 0.3;
 } 
+
+.profileImage{
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
   
   

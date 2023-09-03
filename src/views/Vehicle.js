@@ -38,7 +38,6 @@ import { serviceVehicles } from "services/vehicle";
 import { useNavigate, useParams } from "react-router-dom";
 
 function Vehicle() {
- 
   const [formSubmit, setFormSubmit] = useState({ with_air: true });
   const [drivers, setDriver] = useState([]);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -110,14 +109,14 @@ function Vehicle() {
   }, [drivers]);
 
   useEffect(() => {
-    
     if (params?.id) {
       setLoading(true);
       serviceVehicles
         .getById(params.id)
         .then((res) => {
           setIsUpdate(true);
-          setVehicle(res.data);  console.log(res.data);
+          setVehicle(res.data);
+          console.log(res.data);
           setFormSubmit({
             id: res.data.id || "",
             description: res.data.description || "",
@@ -229,6 +228,7 @@ function Vehicle() {
                             });
                           }}
                         >
+                          <option value=''>Selecionar um Proprietário</option>
                           {drivers.length ? (
                             drivers.map((dr) => {
                               if (dr.User.Driver.length) {

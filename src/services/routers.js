@@ -17,6 +17,16 @@ class RouterServive {
       }
     );
   }
+
+  async update(data) {
+    return await axios.get(
+      `${config.baseUrl}/route`,
+      {
+        headers: { Authorization: `Bearer ${getTokenUserLocal()}` },
+      },
+      { ...data }
+    );
+  }
 }
 
 export const routerService = new RouterServive();

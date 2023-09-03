@@ -31,7 +31,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { travelService } from "services/travel";
 import { toast } from "react-toastify";
-import { formatDateToDisplay } from "helpers/formatDateTpDisplay";
+import { formatDateToDisplay } from "helpers/formatDateToDisplay";
 import { Loader } from "components/Loader/Loader";
 
 function TravelList() {
@@ -100,20 +100,23 @@ function TravelList() {
 
                     <tbody>
                       {travel.map((travelCurrent, index) => (
-                        <tr
-                          style={{ cursor: "pointer" }}
-                          key={index}
-                         
-                        >
+                        <tr style={{ cursor: "pointer" }} key={index}>
                           <td>{travelCurrent?.description}</td>
-                          <td>{formatDateToDisplay(travelCurrent.departureDate)}</td>
+                          <td>
+                            {formatDateToDisplay(travelCurrent.departureDate)}
+                          </td>
                           <td>{travelCurrent.Driver.User.name}</td>
-                          <td>{travelCurrent.Vechicle.description}</td> 
-                          <td className="text-right" onClick={()=>{
-                            navigate(`/add/travel`, {
-                              state: { travel: travelCurrent },
-                            });
-                          }}>Editar</td>
+                          <td>{travelCurrent.Vechicle.description}</td>
+                          <td
+                            className="text-right"
+                            onClick={() => {
+                              navigate(`/add/travel`, {
+                                state: { travel: travelCurrent },
+                              });
+                            }}
+                          >
+                            Editar
+                          </td>
                         </tr>
                       ))}
                     </tbody>

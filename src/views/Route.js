@@ -36,7 +36,7 @@ import {
 } from "reactstrap";
 import { cityService } from "services/city";
 import { routerService } from "services/routers";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 function Route() {
   const [cities, setCities] = React.useState([]);
@@ -44,8 +44,9 @@ function Route() {
   const [loading, setLoading] = React.useState(true);
   const [formSubmit, setFormSubmit] = useState({});
 
-  const location = useLocation()
-  console.log('1==>', location.state)
+  const navigate = useNavigate();
+  const location = useLocation();
+  console.log("1==>", location.state);
   useEffect(() => {
     setLoading(true);
     if (!cities.length) {
@@ -70,9 +71,9 @@ function Route() {
         detiny: location.state.route.destinyId,
         km: location.state.route.km,
         kmValue: location.state.route.kmValue,
-      })
-      console.log('2==>', formSubmit)
-      setLoading(false)
+      });
+      console.log("2==>", formSubmit);
+      setLoading(false);
     }
   }, [location.state?.route]);
 
@@ -107,6 +108,7 @@ function Route() {
         .then((response) => {
           console.log(response);
           toast.success("Rota Cadastrada com sucesso!");
+          navigate("/routes");
         })
         .catch((error) => {
           toast.error(error.message);
@@ -159,12 +161,13 @@ function Route() {
                             });
                           }}
                         >
-                          <option value={formSubmit?.destiny || ''}>{location.state?.route.Origin.name || 'Selecionar Uma Origem'}</option>
+                          <option value={formSubmit?.destiny || ""}>
+                            {location.state?.route?.Origin?.name ||
+                              "Selecionar Uma Origem"}
+                          </option>
 
                           {cities.map((city) => (
-                            <option selected={() => {
-                              return city.id === formSubmit?.origin
-                            }} value={city.id}>{city.name}</option>
+                            <option value={city.id}>{city.name}</option>
                           ))}
                         </Input>
                       </FormGroup>
@@ -176,7 +179,6 @@ function Route() {
                           id="exampleSelect"
                           name="destiny"
                           defaultValue={formSubmit?.destiny || ""}
-
                           type="select"
                           onChange={(e) => {
                             setFormSubmit({
@@ -185,7 +187,10 @@ function Route() {
                             });
                           }}
                         >
-                          <option value={formSubmit?.origin || ''}>{location.state?.route.Destiny.name || 'Selecionar Um Destino'}</option>
+                          <option value={formSubmit?.origin || ""}>
+                            {location.state?.route?.Destiny?.name ||
+                              "Selecionar Um Destino"}
+                          </option>
 
                           {cities.map((city) => (
                             <option value={city.id}>{city.name}</option>
@@ -250,7 +255,9 @@ function Route() {
                         color="primary"
                         type="submit"
                       >
-                        Adicionar Nova Rota
+                        {Object.keys(location?.state?.route || {}).length > 0
+                          ? "Atualizar Rota"
+                          : "Adicionar Nova Rota"}
                       </Button>
                     </div>
                   </Row>
