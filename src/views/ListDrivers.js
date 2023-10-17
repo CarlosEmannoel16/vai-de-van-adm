@@ -90,9 +90,9 @@ function Tables() {
                         <tr
                           style={{ cursor: "pointer" }}
                           key={index}
-                          // onClick={() => {
-                          //   navigate(`/add/driver`);
-                          // }}
+                          onClick={() =>
+                            navigate(`/add/driver`, { state: driver.User.id })
+                          }
                         >
                           <td>{driver.User.name}</td>
                           <td>{driver.User.email}</td>

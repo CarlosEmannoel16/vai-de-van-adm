@@ -29,6 +29,7 @@ import TravelList from "views/TravelsList";
 import Travel from "views/Travels";
 import ListVehicles from "views/ListVehicles";
 import Vehicle from "views/Vehicle";
+import TripStopList from "views/TripStopList";
 
 //import UpgradeToPro from "views/Upgrade.js";
 
@@ -125,6 +126,14 @@ var routes = [
     name: "Motoristas",
     icon: "nc-icon nc-tile-56",
     component: <DriverList />,
+    layout: "/",
+    display: true,
+  },
+  {
+    path: "tripstop",
+    name: "Paradas",
+    icon: "nc-icon nc-tile-56",
+    component: <TripStopList />,
     layout: "/",
     display: true,
   },

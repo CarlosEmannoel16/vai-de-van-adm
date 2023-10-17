@@ -1,26 +1,7 @@
-/*!
-
-=========================================================
-* Paper Dashboard React - v1.3.2
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/paper-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Licensed under MIT (https://github.com/creativetimofficial/paper-dashboard-react/blob/main/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 
-// reactstrap components
 import {
   Button,
   Card,
@@ -28,15 +9,14 @@ import {
   CardBody,
   CardTitle,
   FormGroup,
-  Form,
-  Input,
-  Row,
-  Col,
-  Label,
 } from "reactstrap";
 import { cityService } from "services/city";
 import { routerService } from "services/routers";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Col, Grid, Input, Row, SelectPicker, Tooltip, Whisper } from "rsuite";
+import { InputText } from "components/input";
+import { Select } from "components/Select";
+import { TimelineRoute } from "components/timeline";
 
 function Route() {
   const [cities, setCities] = React.useState([]);
@@ -72,7 +52,6 @@ function Route() {
         km: location.state.route.km,
         kmValue: location.state.route.kmValue,
       });
-      console.log("2==>", formSubmit);
       setLoading(false);
     }
   }, [location.state?.route]);
@@ -121,151 +100,99 @@ function Route() {
   return (
     <>
       <div className="content">
-        <Row>
-          <Col md="12">
-            <Card className="card-user">
-              <CardHeader>
-                <CardTitle tag="h5">Rotas</CardTitle>
-              </CardHeader>
-              <CardBody>
-                <Form onSubmit={onsubmit}>
-                  <Row>
-                    <Col className="pr-1" md="5">
-                      <FormGroup>
-                        <label>Nome</label>
-                        <Input
-                          defaultValue={formSubmit.name || ""}
-                          placeholder="Nome"
-                          type="text"
-                          onChange={(e) => {
-                            setFormSubmit({
-                              ...formSubmit,
-                              name: e.target.value,
-                            });
-                          }}
-                        />
-                      </FormGroup>
-                    </Col>
-                    <Col className="px-1" md="3">
-                      <FormGroup>
-                        <Label for="exampleSelect">Cidade Origem</Label>
-                        <Input
-                          id="exampleSelect"
-                          name="origin"
-                          defaultValue={formSubmit?.origin || ""}
-                          type="select"
-                          onChange={(e) => {
-                            setFormSubmit({
-                              ...formSubmit,
-                              origin: e.target.value,
-                            });
-                          }}
-                        >
-                          <option value={formSubmit?.destiny || ""}>
-                            {location.state?.route?.Origin?.name ||
-                              "Selecionar Uma Origem"}
-                          </option>
-
-                          {cities.map((city) => (
-                            <option value={city.id}>{city.name}</option>
-                          ))}
-                        </Input>
-                      </FormGroup>
-                    </Col>
-                    <Col className="px-1" md="3">
-                      <FormGroup>
-                        <Label for="exampleSelect">Cidade Destino</Label>
-                        <Input
-                          id="exampleSelect"
-                          name="destiny"
-                          defaultValue={formSubmit?.destiny || ""}
-                          type="select"
-                          onChange={(e) => {
-                            setFormSubmit({
-                              ...formSubmit,
-                              destiny: e.target.value,
-                            });
-                          }}
-                        >
-                          <option value={formSubmit?.origin || ""}>
-                            {location.state?.route?.Destiny?.name ||
-                              "Selecionar Um Destino"}
-                          </option>
-
-                          {cities.map((city) => (
-                            <option value={city.id}>{city.name}</option>
-                          ))}
-                        </Input>
-                      </FormGroup>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="4">
-                      <FormGroup>
-                        <label>Distancia</label>
-                        <Input
-                          defaultValue={formSubmit?.km || ""}
-                          placeholder="80"
-                          name="km"
-                          type="number"
-                          onChange={(e) => {
-                            setFormSubmit({
-                              ...formSubmit,
-                              km: e.target.value,
-                            });
-                          }}
-                        />
-                      </FormGroup>
-                    </Col>
-                    <Col className="pr-1" md="4">
-                      <FormGroup>
-                        <label>Valor do KM</label>
-                        <Input
-                          defaultValue={formSubmit?.kmValue || ""}
-                          placeholder="ex: 0.7"
-                          type="text"
-                          onChange={(e) => {
-                            setFormSubmit({
-                              ...formSubmit,
-                              kmValue: e.target.value,
-                            });
-                          }}
-                        />
-                      </FormGroup>
-                    </Col>
-                    <Col className="pr-1" md="3">
-                      <FormGroup>
-                        <label>Valor do Bilheto</label>
-                        <Input
-                          defaultValue=""
-                          disabled
-                          placeholder="R$:0,00"
-                          type="text"
-                          name="ticketValue"
-                          value={ticketValue}
-                        />
-                      </FormGroup>
-                    </Col>
-                  </Row>
-
-                  <Row>
-                    <div className="update ml-auto mr-auto">
-                      <Button
-                        className="btn-round"
-                        color="primary"
-                        type="submit"
-                      >
-                        {Object.keys(location?.state?.route || {}).length > 0
-                          ? "Atualizar Rota"
-                          : "Adicionar Nova Rota"}
-                      </Button>
-                    </div>
-                  </Row>
-                </Form>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+        <Card className="card-user">
+          <CardHeader>
+            <CardTitle tag="h5">Rotas</CardTitle>
+          </CardHeader>
+          <CardBody>
+            <Grid fluid>
+              <Row className="show-grid">
+                <Col xs="8" style={{ marginBottom: 10 }}>
+                  <label>Descrição:</label>
+                  <InputText placeholder="Descricão da rota" size="lg" />
+                </Col>
+                <Col xs="8">
+                  <label>Origem:</label>
+                  <Select
+                    size="lg"
+                    placeholder="Lugar de origem"
+                    data={cities.map((city) => ({
+                      label: city.name,
+                      value: city?.id,
+                    }))}
+                  />
+                </Col>
+                <Col xs="8">
+                  <label>Destino:</label>
+                  <Select
+                    size="lg"
+                    placeholder="Lugar de destino"
+                    data={cities.map((city) => ({
+                      label: city.name,
+                      value: city?.id,
+                    }))}
+                    style={{}}
+                  />
+                </Col>
+              </Row>
+              <Row className="show-grid">
+                <Col xs="8">
+                  <label>Distancia da rota:</label>
+                  <InputText
+                    defaultValue={formSubmit?.km || ""}
+                    placeholder="80"
+                    size="lg"
+                    name="km"
+                    type="number"
+                    onChange={(e) => {
+                      setFormSubmit({
+                        ...formSubmit,
+                        km: e.target.value,
+                      });
+                    }}
+                  />
+                </Col>
+                <Col xs="8">
+                  <label>Valor cobrado por km:</label>
+                  <InputText
+                    defaultValue={formSubmit?.kmValue || ""}
+                    placeholder="ex: 0.7"
+                    type="text"
+                    onChange={(e) => {
+                      setFormSubmit({
+                        ...formSubmit,
+                        kmValue: e.target.value,
+                      });
+                    }}
+                  />
+                </Col>
+                <Col xs="8">
+                  <label>Valor estimado da passagem:</label>
+                  <InputText
+                    defaultValue=""
+                    disabled
+                    placeholder="R$:0,00"
+                    type="text"
+                    name="ticketValue"
+                    value={ticketValue}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <div className="update ml-auto mr-auto">
+                  <Button className="btn-round" color="primary" type="submit">
+                    {Object.keys(location?.state?.route || {}).length > 0
+                      ? "Atualizar Rota"
+                      : "Adicionar Nova Rota"}
+                  </Button>
+                </div>
+              </Row>
+              <Row>
+                <TimelineRoute />
+              </Row>
+            </Grid>
+          </CardBody>
+        </Card>
       </div>
     </>
   );

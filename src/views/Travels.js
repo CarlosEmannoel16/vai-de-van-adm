@@ -384,6 +384,24 @@ function Travel() {
                     ></Input>
                   </FormGroup>
                 </Col>
+                <Col className="px-1" md="3">
+                  <FormGroup>
+                    <Label for="exampleSelect">Viagem Recorrente</Label>
+                    <Input
+                      id="arrivalDate"
+                      type="date"
+                      defaultValue={dataToForm?.arrivalDate
+                        ?.toString()
+                        ?.substring(0, 10)}
+                      onChange={(e) =>
+                        setDataToForm({
+                          ...dataToForm,
+                          arrivalDate: e.target.value,
+                        })
+                      }
+                    ></Input>
+                  </FormGroup>
+                </Col>
               </Row>
 
               <Row>

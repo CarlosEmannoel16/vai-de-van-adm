@@ -26,6 +26,8 @@ import "assets/demo/demo.css";
 import "perfect-scrollbar/css/perfect-scrollbar.css";
 import "react-toastify/dist/ReactToastify.css";
 import AdminLayout from "layouts/Admin.js";
+import "rsuite/dist/rsuite.min.css";
+
 import { ToastContainer } from "react-toastify";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
