@@ -124,7 +124,7 @@ function Vehicle() {
         plate: state.plate || "",
         amount_of_accents: state.quantitySeats || "",
         cor: state.color || "",
-        ownerId: "",
+        ownerId: state.ownerId || "",
         with_air: true,
       });
       setLoading(false);
