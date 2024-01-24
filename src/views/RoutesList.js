@@ -18,7 +18,6 @@
 */
 import React, { useEffect, useState } from "react";
 
-// reactstrap components
 import {
   Card,
   CardHeader,
@@ -32,12 +31,9 @@ import { useNavigate } from "react-router-dom";
 import { routerService } from "services/routers";
 import { Loader } from "components/Loader/Loader";
 
-
-
 function RoutesList() {
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState([]);
-
 
   useState(() => {
     if (!routes.length) {
@@ -45,7 +41,7 @@ function RoutesList() {
       routerService
         .find()
         .then((res) => {
-          console.log(res.data.data);
+          console.log("data====>", res.data.data);
           setRoutes(res.data.data);
           setLoading(false);
         })
@@ -108,8 +104,8 @@ function RoutesList() {
                           }}
                         >
                           <td>{routeCurrent.name}</td>
-                          <td>{routeCurrent.Origin.name}</td>
-                          <td>{routeCurrent.Destiny.name}</td>
+                          <td>{routeCurrent?.Origin?.name}</td>
+                          <td>{routeCurrent?.Destiny?.name}</td>
                           <td>{routeCurrent.km} Km</td>
                           <td className="text-right">Editar</td>
                         </tr>

@@ -3,9 +3,10 @@ import config from "../config";
 import { getTokenUserLocal } from "helpers/localStorage";
 class RouterServive {
   async find() {
-    return await axios.get(`${config.baseUrl}/route`, {
+    const data = await axios.get(`${config.baseUrl}/route`, {
       headers: { Authorization: `Bearer ${getTokenUserLocal()}` },
     });
+    return data;
   }
 
   async create(data) {
