@@ -19,7 +19,6 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-// reactstrap components
 import {
   Button,
   Card,
@@ -36,8 +35,12 @@ import {
 import { userService } from "services/driver";
 import { serviceVehicles } from "services/vehicle";
 import { useNavigate, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 function Vehicle() {
+  let { state } = useLocation();
+  console.log(state);
+
   const [formSubmit, setFormSubmit] = useState({ with_air: true });
   const [drivers, setDriver] = useState([]);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -109,29 +112,22 @@ function Vehicle() {
   }, [drivers]);
 
   useEffect(() => {
-    if (params?.id) {
+    if (state && state.id) {
       setLoading(true);
-      serviceVehicles
-        .getById(params.id)
-        .then((res) => {
-          setIsUpdate(true);
-          setVehicle(res.data);
-          console.log(res.data);
-          setFormSubmit({
-            id: res.data.id || "",
-            description: res.data.description || "",
-            plate: res.data.plate || "",
-            amount_of_accents: res.data.amount_of_accents || "",
-            cor: res.data.cor || "",
-            ownerId: res.data.ownerId || "",
-            with_air: res.data.with_air || true,
-          });
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-          toast.error("Erro ao buscar veiculo");
-        });
+
+      setIsUpdate(true);
+      setVehicle(state);
+
+      setFormSubmit({
+        id: state.id || "",
+        description: state.name || "",
+        plate: state.plate || "",
+        amount_of_accents: state.quantitySeats || "",
+        cor: state.color || "",
+        ownerId: "",
+        with_air: true,
+      });
+      setLoading(false);
     }
   }, []);
 
@@ -185,7 +181,7 @@ function Vehicle() {
                         <Input
                           placeholder="0"
                           type="number"
-                          defaultValue={vehicle.amount_of_accents || ""}
+                          defaultValue={vehicle.quantitySeats || ""}
                           onChange={(e) => {
                             setFormSubmit({
                               ...formSubmit,
@@ -228,7 +224,7 @@ function Vehicle() {
                             });
                           }}
                         >
-                          <option value=''>Selecionar um Proprietário</option>
+                          <option value="">Selecionar um Proprietário</option>
                           {drivers.length ? (
                             drivers.map((dr) => {
                               if (dr.User.Driver.length) {
@@ -278,7 +274,7 @@ function Vehicle() {
                         type="submit"
                         disabled={loading}
                       >
-                        {Object.keys(vehicle).length ? "Editar" : "Adicionar"}
+                        {Object.keys(vehicle).length ? "Salvar" : "Adicionar"}
                       </Button>
                     </div>
                   </Row>

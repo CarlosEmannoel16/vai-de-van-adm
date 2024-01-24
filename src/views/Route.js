@@ -2,21 +2,15 @@ import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 
-import {
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
-  FormGroup,
-} from "reactstrap";
+import { Button, Card, CardHeader, CardBody, CardTitle } from "reactstrap";
 import { cityService } from "services/city";
 import { routerService } from "services/routers";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Col, Grid, Input, Row, SelectPicker, Tooltip, Whisper } from "rsuite";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Col, Grid, Row } from "rsuite";
 import { InputText } from "components/input";
 import { Select } from "components/Select";
 import { TimelineRoute } from "components/timeline";
+import { DndContext } from "@dnd-kit/core";
 
 function Route() {
   const [cities, setCities] = React.useState([]);
@@ -26,7 +20,6 @@ function Route() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  console.log("1==>", location.state);
   useEffect(() => {
     setLoading(true);
     if (!cities.length) {
@@ -186,9 +179,6 @@ function Route() {
                       : "Adicionar Nova Rota"}
                   </Button>
                 </div>
-              </Row>
-              <Row>
-                <TimelineRoute />
               </Row>
             </Grid>
           </CardBody>

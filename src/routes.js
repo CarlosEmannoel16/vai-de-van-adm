@@ -17,11 +17,8 @@
 
 */
 import Dashboard from "views/Dashboard.js";
-//import Notifications from "views/Notifications.js";
-//import Icons from "views/Icons.js";
-//import Typography from "views/Typography.js";
+
 import DriverList from "views/ListDrivers";
-//import Maps from "views/Map.js";
 import RoutePage from "views/Route";
 import RouteList from "views/RoutesList";
 import Driver from "views/Drivers";
@@ -30,8 +27,6 @@ import Travel from "views/Travels";
 import ListVehicles from "views/ListVehicles";
 import Vehicle from "views/Vehicle";
 import TripStopList from "views/TripStopList";
-
-//import UpgradeToPro from "views/Upgrade.js";
 
 var routes = [
   {
@@ -82,7 +77,7 @@ var routes = [
     display: true,
   },
   {
-    path: "vehicles/:id?",
+    path: "/vehicle",
     name: "Veiculos",
     icon: "nc-icon nc-single-02",
     component: <Vehicle />,

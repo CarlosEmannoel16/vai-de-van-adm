@@ -28,7 +28,6 @@ import {
   Row,
   Col,
 } from "reactstrap";
-import { userService } from "../services/driver";
 import { useNavigate } from "react-router-dom";
 import { serviceVehicles } from "services/vehicle";
 import { Loader } from "components/Loader/Loader";
@@ -127,13 +126,17 @@ function ListVehicles() {
                           //   navigate(`/add/driver`);
                           // }}
                         >
-                          <td>{vehicle.description}</td>
-                          <td>{vehicle.amount_of_accents}</td>
-                          <td>{vehicle.cor}</td>
+                          <td>{vehicle.name}</td>
+                          <td>{vehicle.quantitySeats}</td>
+                          <td>{vehicle.color}</td>
                           <td>{vehicle.plate}</td>
                           <td
                             className="text-right"
-                            onClick={(e) => navigate("/vehicles/" + vehicle.id)}
+                            onClick={(e) =>
+                              navigate("/vehicle", {
+                                state: vehicle,
+                              })
+                            }
                           >
                             Editar
                           </td>
