@@ -15,9 +15,12 @@ class ServiceDriverAndUsers {
   }
 
   async getAll() {
-    return await axios.get(`${config.baseUrl}/users`, {
+    const data = await axios.get(`${config.baseUrl}/users`, {
       headers: { Authorization: `Bearer ${getTokenUserLocal()}` },
     });
+
+    console.log(data);
+    return data;
   }
 
   async getById(id) {
