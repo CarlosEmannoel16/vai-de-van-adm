@@ -23,6 +23,15 @@ class ServiceDriverAndUsers {
     return data;
   }
 
+  async getAllDrivers() {
+    const data = await axios.get(`${config.baseUrl}/drivers`, {
+      headers: { Authorization: `Bearer ${getTokenUserLocal()}` },
+    });
+
+    console.log(data);
+    return data;
+  }
+
   async getById(id) {
     return await axios.get(`${config.baseUrl}/user/${id}`, {
       headers: { Authorization: `Bearer ${getTokenUserLocal()}` },

@@ -47,7 +47,7 @@ function TravelList() {
           if (res?.data.length === 0) {
             toast.warn("Nenhuma viagem cadastrada");
           }
-          console.log(res.data);
+          console.log("VIAGENS++++>>>", res.data);
           setTravel(res.data || []);
           setLoading(false);
         })
@@ -94,6 +94,7 @@ function TravelList() {
                         <th>Data da viagem</th>
                         <th>Motorista</th>
                         <th>Veiculo</th>
+                        <th>Status</th>
                         <th className="text-right">Editar</th>
                       </tr>
                     </thead>
@@ -103,10 +104,31 @@ function TravelList() {
                         <tr style={{ cursor: "pointer" }} key={index}>
                           <td>{travelCurrent?.description}</td>
                           <td>
-                            {formatDateToDisplay(travelCurrent.departureDate)}
+                            {formatDateToDisplay(travelCurrent?.departureDate)}
                           </td>
-                          <td>{travelCurrent.Driver.User.name}</td>
-                          <td>{travelCurrent.Vechicle.description}</td>
+                          <td>{travelCurrent?.driverName}</td>
+                          <td>{travelCurrent?.vehicleName}</td>
+                          <td>
+                            <div
+                              style={{
+                                width: "10px",
+                                height: "10px",
+                                borderRadius: "50%",
+                                display: "inline-block",
+                                marginRight: "5px",
+                                backgroundColor: `${
+                                  travelCurrent?.status === "DESABILITADA"
+                                    ? "#808080"
+                                    : travelCurrent?.status === "CANCELADA"
+                                    ? "#FF0000"
+                                    : travelCurrent?.status === "EM ANDAMENTO"
+                                    ? "#FFA500"
+                                    : "#008000"
+                                }`,
+                              }}
+                            ></div>
+                            {travelCurrent?.status}
+                          </td>
                           <td
                             className="text-right"
                             onClick={() => {

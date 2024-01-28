@@ -41,7 +41,6 @@ function RoutesList() {
       routerService
         .find()
         .then((res) => {
-          console.log("data====>", res.data.data);
           setRoutes(res.data.data);
           setLoading(false);
         })

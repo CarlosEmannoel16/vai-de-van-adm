@@ -17,6 +17,8 @@
 
 */
 import React, { useEffect, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+
 import * as yup from "yup";
 // reactstrap components
 import {
@@ -36,11 +38,7 @@ import { routerService } from "services/routers";
 import "../assets/css/travelsAdd.css";
 import { cityService } from "services/city";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBus,
-  faLocationDot,
-  faMapPin,
-} from "@fortawesome/free-solid-svg-icons";
+
 import { toast } from "react-toastify";
 import { userService } from "services/driver";
 import { serviceVehicles } from "services/vehicle";
@@ -48,6 +46,16 @@ import { travelService } from "services/travel";
 import { useLocation, useNavigate } from "react-router-dom";
 //import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function Travel() {
+  const {
+    control,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "Viagem 1",
+    },
+  });
+
   const [routes, setRoutes] = useState([]);
 
   const [pitStops, setPitStops] = useState([]);
@@ -59,77 +67,20 @@ function Travel() {
 
   const location = useLocation();
   const navigate = useNavigate();
+  console.log("location===>", location.state);
   useEffect(() => {
-    if (location?.state?.travel && !Object.keys(dataToForm).length) {
-      console.log("setendo");
-      setDataToForm({
-        ...location.state?.travel,
-      });
-      let pitStops = [...location.state?.travel?.TripStops];
-      pitStops[0] = {
-        ...pitStops[0],
-        fixed: true,
-      };
-      setPitStops(pitStops);
-    }
+    // if (location?.state?.travel && !Object.keys(dataToForm).length) {
+    //   setDataToForm({
+    //     ...location.state?.travel,
+    //   });
+    //   let pitStops = [...location.state?.travel?.TripStops];
+    //   pitStops[0] = {
+    //     ...pitStops[0],
+    //     fixed: true,
+    //   };
+    //   setPitStops(pitStops);
+    // }
   }, [location?.state?.travel]);
-
-  const handleButtonAddPitStop = () => {
-    if (pitStops.length === 0) {
-      toast.warning("Selecione uma rota");
-      return;
-    }
-    if (pitStops.length >= 2) {
-      const pitStops1 = [...pitStops];
-      const lastPitStop = pitStops1[pitStops1.length - 1];
-      pitStops1[pitStops1.length - 1] = { fixed: false };
-      pitStops1.push(lastPitStop);
-      setPitStops(pitStops1);
-    }
-  };
-
-  const handleSelectRouter = (routerString) => {
-    const router = JSON.parse(routerString);
-    if (pitStops.length === 0) {
-      setPitStops([
-        {
-          fixed: true,
-          cityIdFromTo: router.Origin.id,
-          name: router.Origin.name,
-          tripStopOrder: 0,
-        },
-        {
-          fixed: true,
-          cityIdFromTo: router.Destiny.id,
-          name: router.Destiny.name,
-          tripStopOrder: 999,
-        },
-      ]);
-      setDataToForm({
-        ...dataToForm,
-        routeId: router.id,
-      });
-    } else {
-      const pitStops1 = [...pitStops];
-      pitStops1[0] = {
-        fixed: true,
-        cityIdFromTo: router.Origin.id,
-        name: router.Origin.name,
-        tripStopOrder: 0,
-      };
-      pitStops1[pitStops1.length - 1] = {
-        fixed: true,
-        cityIdFromTo: router.Destiny.id,
-        name: router.Destiny.name,
-        tripStopOrder: 999,
-      };
-      setDataToForm({
-        ...dataToForm,
-        routeId: router.id,
-      });
-      setPitStops([...pitStops1]);
-    }
-  };
 
   const onSubmit = async (e) => {
     try {
@@ -186,18 +137,6 @@ function Travel() {
     }
   };
 
-  const handleSelectCity = (city, index) => {
-    const cityData = JSON.parse(city);
-    const copyPitStops = [...pitStops];
-    copyPitStops[index] = {
-      ...pitStops[index],
-      cityIdFromTo: cityData.id,
-      tripStopOrder: index,
-      name: cityData.name,
-    };
-    setPitStops(copyPitStops);
-  };
-
   useState(() => {
     if (!routes.length && !cities.length) {
       // setLoading(true);
@@ -213,7 +152,8 @@ function Travel() {
           });
         })
         .then(() => {
-          userService.getAll().then((response) => {
+          userService.getAllDrivers().then((response) => {
+            console.log("response.data.data", response.data.data);
             setDrivers(response.data.data);
           });
         })
@@ -234,193 +174,201 @@ function Travel() {
         <Card className="card-user">
           <CardHeader>
             <CardTitle tag="h5">
-              {" "}
               {!!location.state?.travel
                 ? "Edicao de Viagem"
                 : "Cadastro de Viagem"}
             </CardTitle>
           </CardHeader>
           <CardBody>
-            <Form onSubmit={onSubmit}>
-              <Row>
-                <Col className="pr-1" md="5">
-                  <FormGroup>
-                    <label>Nome</label>
-                    <Input
-                      defaultValue={dataToForm?.description || ""}
-                      placeholder="Descricao da Viagem"
-                      onChange={(e) =>
-                        setDataToForm({
-                          ...dataToForm,
-                          description: e.target.value,
-                        })
-                      }
-                      type="text"
+            <Form>
+              <form onSubmit={onSubmit}>
+                <Row>
+                  <Col className="pr-1" md="5">
+                    <Controller
+                      name="name"
+                      control={control}
+                      render={({ field }) => (
+                        <FormGroup>
+                          <label>Nome</label>
+                          <Input
+                            defaultValue={field.value}
+                            placeholder="Descricao da Viagem"
+                            onChange={(e) => setValue}
+                            type="text"
+                          />
+                        </FormGroup>
+                      )}
                     />
-                  </FormGroup>
-                </Col>
-                <Col className="px-1" md="3">
-                  <FormGroup>
-                    <Label for="exampleSelect">Rota</Label>
-                    <Input
-                      id="idRoute"
+                  </Col>
+                  <Col className="px-1" md="3">
+                    <Controller
+                      control={control}
                       name="idRoute"
-                      type="select"
-                      defaultValue={JSON.stringify(dataToForm?.Route)}
-                      onChange={(e) => {
-                        handleSelectRouter(e.target.value);
-                      }}
-                    >
-                      <option
-                        key={897986}
-                        value={JSON.stringify(dataToForm?.Route)}
-                      >
-                        {dataToForm?.Route?.name || "Selecionar Uma Rota"}
-                      </option>
-                      {routes.length &&
-                        routes.map((route, index) => (
-                          <option key={index} value={JSON.stringify(route)}>
-                            {route.name}
-                          </option>
-                        ))}
-                    </Input>
-                  </FormGroup>
-                </Col>
-                <Col className="px-1" md="3">
-                  <FormGroup>
-                    <Label for="exampleSelect">Motorista</Label>
-                    <Input
-                      id="driverId"
+                      render={({ field }) => (
+                        <FormGroup>
+                          <Label for="exampleSelect">Rota</Label>
+                          <Input
+                            id="idRoute"
+                            name="idRoute"
+                            type="select"
+                            defaultValue={JSON.stringify(dataToForm?.Route)}
+                            onChange={(e) => {}}
+                          >
+                            <option
+                              key={897986}
+                              value={JSON.stringify(dataToForm?.Route)}
+                            >
+                              {dataToForm?.Route?.name || "Selecionar Uma Rota"}
+                            </option>
+                            {routes.length &&
+                              routes.map((route, index) => (
+                                <option
+                                  key={index}
+                                  value={JSON.stringify(route)}
+                                >
+                                  {route.name}
+                                </option>
+                              ))}
+                          </Input>
+                        </FormGroup>
+                      )}
+                    />
+                  </Col>
+                  <Col className="px-1" md="3">
+                    <Controller
+                      control={control}
                       name="driverId"
-                      type="select"
-                      placeholder="Digite o Nome do Motorista"
-                      defaultValue={dataToForm?.Driver?.User?.id}
-                      onChange={(e) =>
-                        setDataToForm({
-                          ...dataToForm,
-                          driverId: e.target.value,
-                        })
-                      }
-                    >
-                      <option key={897986} value={dataToForm?.Driver?.User?.id}>
-                        {dataToForm?.Driver?.User?.name ||
-                          "Selecionar Um Motorista"}
-                      </option>
-                      {drivers.length &&
-                        drivers.map((driver) => {
-                          if (driver.User.Driver.length > 0)
+                      render={({ field }) => (
+                        <FormGroup>
+                          <Label for="exampleSelect">Motorista</Label>
+                          <Input
+                            id="driverId"
+                            name="driverId"
+                            type="select"
+                            placeholder="Digite o Nome do Motorista"
+                            defaultValue={field.value}
+                            onChange={(e) => setValue}
+                          >
+                            <option key={897986} value={field.value}>
+                              {field.value || "Selecionar Um Motorista"}
+                            </option>
+                            {drivers.length &&
+                              drivers.map((driver) => {
+                                return (
+                                  <option value={driver.id}>
+                                    {driver.name}
+                                  </option>
+                                );
+                              })}
+                          </Input>
+                        </FormGroup>
+                      )}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className="pr-1" md="3">
+                    <FormGroup>
+                      <Label for="exampleSelect">Veiculo</Label>
+                      <Input
+                        id="idVehicle"
+                        name="idVehicle"
+                        defaultValue={dataToForm?.Vehicle?.id}
+                        type="select"
+                        onChange={(e) =>
+                          setDataToForm({
+                            ...dataToForm,
+                            idVehicle: e.target.value,
+                          })
+                        }
+                      >
+                        <option key={897986} value={dataToForm?.Vechicle?.id}>
+                          {dataToForm?.Vechicle?.description ||
+                            "Selecionar Um Veiculo"}
+                        </option>
+                        {vehicles.length &&
+                          vehicles.map((vh) => {
                             return (
-                              <option value={driver.User.id}>
-                                {driver.User.name}
-                              </option>
+                              <option value={vh.id}>{vh.description}</option>
                             );
-                        })}
-                    </Input>
-                  </FormGroup>
-                </Col>
-              </Row>
-              <Row>
-                <Col className="pr-1" md="3">
-                  <FormGroup>
-                    <Label for="exampleSelect">Veiculo</Label>
-                    <Input
-                      id="idVehicle"
-                      name="idVehicle"
-                      defaultValue={dataToForm?.Vehicle?.id}
-                      type="select"
-                      onChange={(e) =>
-                        setDataToForm({
-                          ...dataToForm,
-                          idVehicle: e.target.value,
-                        })
-                      }
-                    >
-                      <option key={897986} value={dataToForm?.Vechicle?.id}>
-                        {dataToForm?.Vechicle?.description ||
-                          "Selecionar Um Veiculo"}
-                      </option>
-                      {vehicles.length &&
-                        vehicles.map((vh) => {
-                          return (
-                            <option value={vh.id}>{vh.description}</option>
-                          );
-                        })}
-                    </Input>
-                  </FormGroup>
-                </Col>
-                <Col className="px-1" md="3">
-                  <FormGroup>
-                    <Label for="exampleSelect">Data de Partida</Label>
-                    <Input
-                      id="departureDate"
-                      type="date"
-                      defaultValue={dataToForm?.departureDate
-                        ?.toString()
-                        ?.substring(0, 10)}
-                      onChange={(e) =>
-                        setDataToForm({
-                          ...dataToForm,
-                          departureDate: e.target.value,
-                        })
-                      }
-                    ></Input>
-                  </FormGroup>
-                </Col>
-                <Col className="px-1" md="3">
-                  <FormGroup>
-                    <Label for="exampleSelect">Data de Chegada</Label>
-                    <Input
-                      id="arrivalDate"
-                      type="date"
-                      defaultValue={dataToForm?.arrivalDate
-                        ?.toString()
-                        ?.substring(0, 10)}
-                      onChange={(e) =>
-                        setDataToForm({
-                          ...dataToForm,
-                          arrivalDate: e.target.value,
-                        })
-                      }
-                    ></Input>
-                  </FormGroup>
-                </Col>
-                <Col className="px-1" md="3">
-                  <FormGroup>
-                    <Label for="exampleSelect">Viagem Recorrente</Label>
-                    <Input
-                      id="arrivalDate"
-                      type="date"
-                      defaultValue={dataToForm?.arrivalDate
-                        ?.toString()
-                        ?.substring(0, 10)}
-                      onChange={(e) =>
-                        setDataToForm({
-                          ...dataToForm,
-                          arrivalDate: e.target.value,
-                        })
-                      }
-                    ></Input>
-                  </FormGroup>
-                </Col>
-              </Row>
+                          })}
+                      </Input>
+                    </FormGroup>
+                  </Col>
+                  <Col className="px-1" md="3">
+                    <FormGroup>
+                      <Label for="exampleSelect">Data de Partida</Label>
+                      <Input
+                        id="departureDate"
+                        type="date"
+                        defaultValue={dataToForm?.departureDate
+                          ?.toString()
+                          ?.substring(0, 10)}
+                        onChange={(e) =>
+                          setDataToForm({
+                            ...dataToForm,
+                            departureDate: e.target.value,
+                          })
+                        }
+                      ></Input>
+                    </FormGroup>
+                  </Col>
+                  <Col className="px-1" md="3">
+                    <FormGroup>
+                      <Label for="exampleSelect">Data de Chegada</Label>
+                      <Input
+                        id="arrivalDate"
+                        type="date"
+                        defaultValue={dataToForm?.arrivalDate
+                          ?.toString()
+                          ?.substring(0, 10)}
+                        onChange={(e) =>
+                          setDataToForm({
+                            ...dataToForm,
+                            arrivalDate: e.target.value,
+                          })
+                        }
+                      ></Input>
+                    </FormGroup>
+                  </Col>
+                  <Col className="px-1" md="3">
+                    <FormGroup>
+                      <Label for="exampleSelect">Viagem Recorrente</Label>
+                      <Input
+                        id="arrivalDate"
+                        type="date"
+                        defaultValue={dataToForm?.arrivalDate
+                          ?.toString()
+                          ?.substring(0, 10)}
+                        onChange={(e) =>
+                          setDataToForm({
+                            ...dataToForm,
+                            arrivalDate: e.target.value,
+                          })
+                        }
+                      ></Input>
+                    </FormGroup>
+                  </Col>
+                </Row>
 
-              <Row>
-                <div className="update ml-auto mr-auto">
-                  <Button
-                    className="btn-round"
-                    color="primary"
-                    type="submit"
-                    disabled={loading}
-                  >
-                    Salvar
-                  </Button>
-                </div>
-              </Row>
+                <Row>
+                  <div className="update ml-auto mr-auto">
+                    <Button
+                      className="btn-round"
+                      color="primary"
+                      type="submit"
+                      disabled={loading}
+                    >
+                      Salvar
+                    </Button>
+                  </div>
+                </Row>
+              </form>
             </Form>
           </CardBody>
         </Card>
 
-        {pitStops.length > 0 &&
+        {/* {pitStops.length > 0 &&
           pitStops.map((pitStop, index) => (
             <Row
               style={{
@@ -534,9 +482,9 @@ function Travel() {
                 </Card>
               </Col>
             </Row>
-          ))}
+          ))} */}
 
-        <Row
+        {/* <Row
           onClick={() => {
             handleButtonAddPitStop();
           }}
@@ -544,7 +492,7 @@ function Travel() {
           <Col md="12">
             <Card className="TravelAdd">Adicionar Nova Parada</Card>
           </Col>
-        </Row>
+        </Row> */}
       </div>
     </>
   );
