@@ -231,8 +231,9 @@ function Travel() {
                           <Label for="exampleSelect">Data de Partida</Label>
                           <DatePicker
                             format="dd/MM/yyyy"
-                            defaultValue={new Date(field.value) || new Date()}
+                            defaultValue={new Date()}
                             onChange={(e) => {
+                              new Date(e).toISOString();
                               setValue(field.name, new Date(e).toISOString());
                             }}
                             name="departureDate"
@@ -253,8 +254,10 @@ function Travel() {
                           <DatePicker
                             format="dd/MM/yyyy"
                             placeholder="Data de Chegada"
-                            defaultValue={field.value || new Date()}
-                            onChange={(e) => setValue(field.name, new Date(e))}
+                            defaultValue={new Date()}
+                            onChange={(e) =>
+                              setValue(field.name, new Date(e).toISOString())
+                            }
                             name="arrivalDate"
                             size="lg"
                           />

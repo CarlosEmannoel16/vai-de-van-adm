@@ -27,6 +27,7 @@ import {
   Table,
   Row,
   Col,
+  Button,
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import { travelService } from "services/travel";
@@ -47,7 +48,6 @@ function TravelList() {
           if (res?.data.length === 0) {
             toast.warn("Nenhuma viagem cadastrada");
           }
-          console.log("VIAGENS++++>>>", res.data);
           setTravel(res.data || []);
           setLoading(false);
         })
@@ -74,15 +74,13 @@ function TravelList() {
                 }}
               >
                 <CardTitle tag="h4">Viagens</CardTitle>
-                <CardTitle
-                  style={{ cursor: "pointer" }}
-                  tag="h3"
+                <Button
                   onClick={() => {
                     navigate(`/add/travel`);
                   }}
                 >
-                  <i className="nc-icon nc-simple-add" />
-                </CardTitle>
+                  Criar Novo
+                </Button>
               </CardHeader>
 
               {!loading && travel.length > 0 ? (
@@ -91,6 +89,7 @@ function TravelList() {
                     <thead className="text-primary">
                       <tr>
                         <th>Descricao</th>
+                        <th>rota</th>
                         <th>Data da viagem</th>
                         <th>Motorista</th>
                         <th>Veiculo</th>
@@ -103,6 +102,7 @@ function TravelList() {
                       {travel.map((travelCurrent, index) => (
                         <tr style={{ cursor: "pointer" }} key={index}>
                           <td>{travelCurrent?.description}</td>
+                          <td>{travelCurrent?.routeDescription}</td>
                           <td>
                             {formatDateToDisplay(travelCurrent?.departureDate)}
                           </td>

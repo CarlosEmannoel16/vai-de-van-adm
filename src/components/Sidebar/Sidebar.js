@@ -47,30 +47,44 @@ function Sidebar(props) {
     };
   });
   return (
-    <div className="sidebar" >
-
-     <div className="logo" style={{backgroundColor: '#320d6d', display:'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>
-      <img src={logo} alt="..." style={{width: '50px', height: '50px'}}/>
-      <p style={{color: 'white', fontSize: '20px', fontWeight: 'bold'}}>Vai de Van</p>
-      </div>  
-      <div className="sidebar-wrapper" ref={sidebar}  style={{backgroundColor: '#320d6d'}}>
+    <div className="sidebar">
+      <div
+        className="logo"
+        style={{
+          backgroundColor: "#320d6d",
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "row",
+          justifyContent: "center",
+        }}
+      >
+        <img src={logo} alt="..." style={{ width: "50px", height: "50px" }} />
+        <p style={{ color: "white", fontSize: "20px", fontWeight: "bold" }}>
+          Vai de Van
+        </p>
+      </div>
+      <div
+        className="sidebar-wrapper"
+        ref={sidebar}
+        style={{ backgroundColor: "#320d6d" }}
+      >
         <Nav>
-          {props.routes.map((prop, key) => {
-            if (prop.display === false) return null;
-            return (
-              <li
-                className={
-                  activeRoute(prop.path) + (prop.pro ? " active-pro" : "")
-                }
-                key={key}
-              >
-                <NavLink to={prop.layout + prop.path} className="nav-NavLink">
-                  <i className={prop.icon} />
-                  <p>{prop.name}</p>
-                </NavLink>
-              </li>
-            );
-          })}
+          {props.routes.map(
+            ({ display, path, pro, layout, name, icon }, key) => {
+              if (display === false) return null;
+              return (
+                <li
+                  className={activeRoute(path) + (pro ? " active-pro" : "")}
+                  key={key}
+                >
+                  <NavLink to={layout + path} className="nav-NavLink">
+                    {icon}
+                    <p>{name}</p>
+                  </NavLink>
+                </li>
+              );
+            }
+          )}
         </Nav>
       </div>
     </div>

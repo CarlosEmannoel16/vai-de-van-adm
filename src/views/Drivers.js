@@ -21,7 +21,7 @@ import { useForm, Controller } from "react-hook-form";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import "../assets/css/driver.css";
-import { Row, Col, Grid } from "rsuite";
+import { Row, Col, Grid, Input, DatePicker } from "rsuite";
 import {
   Button,
   Card,
@@ -29,7 +29,6 @@ import {
   CardBody,
   CardTitle,
   FormGroup,
-  Input,
   CardFooter,
   Label,
 } from "reactstrap";
@@ -38,9 +37,11 @@ import { Loader } from "components/Loader/Loader";
 import { formatDateToInputUpdate } from "../helpers/formatDateToDisplay";
 import profileM from "../assets/img/profile-m.jpg";
 import capa from "../assets/img/jan-sendereks.jpg";
+import { Select } from "components/Select";
+import { driverValidation } from "./validations/driverValidation";
 
 function Driver() {
-  const { handleSubmit, control, setValue, reset, watch } = useForm();
+  const { handleSubmit, control, setValue, reset } = useForm();
 
   const [formSubmit, setFormSubmit] = useState({});
   const [driver, setDriver] = useState({});
@@ -51,10 +52,8 @@ function Driver() {
   const id = useLocation().state;
 
   const uploadProfileImage = (file) => {
-    console.log(file);
     const reader = new FileReader();
     reader.onload = (e) => {
-      alert(e.target.result);
       document.querySelector(".profileImageLabel").src = e.target.result;
     };
 
@@ -73,7 +72,7 @@ function Driver() {
         console.log(result);
         setDriver(result);
         setIsUpdate(true);
-        setFormSubmit({
+        reset({
           id: result.id,
           type: result.type,
           name: result.name,
@@ -85,30 +84,36 @@ function Driver() {
           cnh: result.Driver[0].cnh,
           cnhDateOfIssue: result.Driver[0].cnhDateOfIssue,
           cnhExpirationDate: result.Driver[0].cnhExpirationDate,
-        }); // eslint-disable-line
+        });
         setLoading(false);
       });
     }
   }, [id]);
-  const onSubmit = (e) => {
+  const onSubmit = async (data) => {
     try {
-      e.preventDefault();
+      driverValidation(data);
+      if (!id) await handleCreateDriver(data);
+      else await handleUpdateDriver(data);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
-      if (!id) {
-        userService.create(formSubmit).then((res) => {
-          toast.success("Motorista cadastrado com sucesso!");
-          setTimeout(() => {
-            navigate("/drivers");
-          }, 2000);
-        });
-      } else {
-        userService.update(formSubmit).then((res) => {
-          toast.success("Motorista Atualizado com sucesso!");
-          setTimeout(() => {
-            navigate("/drivers");
-          }, 2000);
-        });
-      }
+  const handleCreateDriver = async (data) => {
+    try {
+      await userService.create({ ...data });
+      toast.success("Motorista cadastrado com sucesso!");
+      navigate("/drivers");
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleUpdateDriver = async (data) => {
+    try {
+      await userService.update({ ...data });
+      toast.success("Motorista atualizado com sucesso!");
+      navigate("/drivers");
     } catch (error) {
       toast.error(error.message);
     }
@@ -259,127 +264,168 @@ function Driver() {
                       </Row>
                       <Row className="show-grid">
                         <Col xs={8}>
-                          <FormGroup>
-                            <label>CPF*</label>
-                            <Input
-                              placeholder="09878912343"
-                              type="text"
-                              value={formSubmit.cpf || ""}
-                              onChange={(e) => {
-                                setFormSubmit({
-                                  ...formSubmit,
-                                  cpf: e.target.value,
-                                });
-                              }}
-                            />
-                          </FormGroup>
+                          <Controller
+                            name="cpf"
+                            control={control}
+                            render={({ field }) => (
+                              <div className="verticalDirection">
+                                <label>CPF*</label>
+                                <Input
+                                  type="text"
+                                  size="lg"
+                                  defaultValue={field.value}
+                                  placeholder="CPF do motorista"
+                                  onChange={(e) => setValue(field.name, e)}
+                                />
+                              </div>
+                            )}
+                          />
                         </Col>
                         <Col xs={8}>
-                          <FormGroup>
-                            <label>Telefone</label>
-                            <Input
-                              placeholder="88997017654"
-                              type="text"
-                              value={formSubmit.phone || ""}
-                              onChange={(e) => {
-                                setFormSubmit({
-                                  ...formSubmit,
-                                  phone: e.target.value,
-                                });
-                              }}
-                            />
-                          </FormGroup>
+                          <Controller
+                            name="phone"
+                            control={control}
+                            render={({ field }) => (
+                              <div className="verticalDirection">
+                                <label>Telefone</label>
+                                <Input
+                                  type="text"
+                                  size="lg"
+                                  defaultValue={field.value}
+                                  placeholder="Telefone do  motorista"
+                                  onChange={(e) => setValue(field.name, e)}
+                                />
+                              </div>
+                            )}
+                          />
+                        </Col>
+                        <Col xs={8}>
+                          <Controller
+                            control={control}
+                            name="date_of_birth"
+                            render={({ field }) => (
+                              <div className="verticalDirection">
+                                <Label for="exampleSelect">
+                                  Data de Nascimento
+                                </Label>
+                                <DatePicker
+                                  format="dd/MM/yyyy"
+                                  defaultValue={new Date()}
+                                  onChange={(e) => {
+                                    setValue(
+                                      field.name,
+                                      new Date(e).toISOString()
+                                    );
+                                  }}
+                                  name="date_of_birth"
+                                  size="lg"
+                                  placeholder="Data de Partida"
+                                />
+                              </div>
+                            )}
+                          />
                         </Col>
                       </Row>
                       <Row className="show-grid">
                         <Col xs={8}>
-                          <FormGroup>
-                            <label>Data de Nascimento</label>
-                            <Input
-                              type="date"
-                              defaultValue={formatDateToInputUpdate(
-                                driver?.date_of_birth ||
-                                  new Date().toISOString()
-                              )}
-                              onChange={(e) => {
-                                setFormSubmit({
-                                  ...formSubmit,
-                                  date_of_birth: e.target.value,
-                                });
-                              }}
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col xs={8}>
-                          <FormGroup>
-                            <Label for="exampleSelect">Sexo</Label>
-                            <Input
-                              id="exampleSelect"
-                              name="select"
-                              type="select"
-                            >
-                              <option>Selecionar</option>
-                              <option>Masculino</option>
-                              <option>Feminino</option>
-                              <option> Não binário </option>
-                            </Input>
-                          </FormGroup>
+                          <Controller
+                            control={control}
+                            name="sexo"
+                            render={({ field }) => (
+                              <div className="verticalDirection">
+                                <Label for="exampleSelect">Sexo</Label>
+                                <Select
+                                  defaultValue={field.value}
+                                  data={
+                                    [
+                                      { label: "Masculino", value: "M" },
+                                      { label: "Feminino", value: "F" },
+                                      {
+                                        label: "Prefiro não informar",
+                                        value: "N",
+                                      },
+                                    ] || []
+                                  }
+                                  onChange={(e) => setValue(field.name, e)}
+                                  placeholder="Sexo"
+                                />
+                              </div>
+                            )}
+                          />
                         </Col>
                       </Row>
 
                       <hr />
                       <Row className="show-grid">
                         <Col xs={8}>
-                          <FormGroup>
-                            <label>CNH</label>
-                            <Input
-                              placeholder=""
-                              type="text"
-                              value={formSubmit.cnh || ""}
-                              onChange={(e) => {
-                                setFormSubmit({
-                                  ...formSubmit,
-                                  cnh: e.target.value,
-                                });
-                              }}
-                            />
-                          </FormGroup>
+                          <Controller
+                            name="cnh"
+                            control={control}
+                            render={({ field }) => (
+                              <div className="verticalDirection">
+                                <label>CNH*</label>
+                                <Input
+                                  type="text"
+                                  size="lg"
+                                  defaultValue={field.value}
+                                  placeholder="N. da CNH do motorista"
+                                  onChange={(e) => setValue(field.name, e)}
+                                />
+                              </div>
+                            )}
+                          />
                         </Col>
                         <Col xs={8}>
-                          <FormGroup>
-                            <label>Data de Emissao*</label>
-                            <Input
-                              type="date"
-                              defaultValue={formatDateToInputUpdate(
-                                formSubmit?.cnhDateOfIssue ||
-                                  new Date().toISOString()
-                              )}
-                              onChange={(e) => {
-                                setFormSubmit({
-                                  ...formSubmit,
-                                  cnhDateOfIssue: e.target.value,
-                                });
-                              }}
-                            />
-                          </FormGroup>
+                          <Controller
+                            control={control}
+                            name="cnhDateOfIssue"
+                            render={({ field }) => (
+                              <div className="verticalDirection">
+                                <Label for="exampleSelect">
+                                  Data de Emissao*
+                                </Label>
+                                <DatePicker
+                                  format="dd/MM/yyyy"
+                                  defaultValue={new Date()}
+                                  onChange={(e) => {
+                                    setValue(
+                                      field.name,
+                                      new Date(e).toISOString()
+                                    );
+                                  }}
+                                  name="departureDate"
+                                  size="lg"
+                                  placeholder="Data de Emissao da cnh"
+                                />
+                              </div>
+                            )}
+                          />
                         </Col>
                         <Col xs={8}>
-                          <FormGroup>
-                            <label>Data de Validade*</label>
-                            <Input
-                              type="date"
-                              defaultValue={formatDateToInputUpdate(
-                                formSubmit?.cnhExpirationDate ||
-                                  new Date().toISOString()
-                              )}
-                              onChange={(e) => {
-                                setFormSubmit({
-                                  ...formSubmit,
-                                  cnhExpirationDate: e.target.value,
-                                });
-                              }}
-                            />
-                          </FormGroup>
+                          <Controller
+                            control={control}
+                            name="cnhExpirationDate"
+                            render={({ field }) => (
+                              <div className="verticalDirection">
+                                <Label for="exampleSelect">
+                                  Data de Validade*
+                                </Label>
+                                <DatePicker
+                                  format="dd/MM/yyyy"
+                                  defaultValue={new Date()}
+                                  onChange={(e) => {
+                                    setValue(
+                                      field.name,
+                                      new Date(e).toISOString()
+                                    );
+                                  }}
+                                  name="cnhExpirationDate"
+                                  size="lg"
+                                  placeholder="Data de validade da cnh"
+                                />
+                              </div>
+                            )}
+                          />
                         </Col>
                       </Row>
                       <Row className="show-grid"></Row>

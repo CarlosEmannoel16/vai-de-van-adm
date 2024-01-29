@@ -27,6 +27,7 @@ import {
   Table,
   Row,
   Col,
+  Button,
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import { serviceVehicles } from "services/vehicle";
@@ -92,15 +93,15 @@ function ListVehicles() {
                 }}
               >
                 <CardTitle tag="h4">Veiculos</CardTitle>
-                <CardTitle
-                  style={{ cursor: "pointer" }}
-                  tag="h3"
-                  onClick={() => {
-                    navigate(`/vehicles`);
+
+                <Button
+                  onClick={(e) => {
+                    console.log(e);
+                    navigate(`/vehicle`);
                   }}
                 >
-                  <i className="nc-icon nc-simple-add" />
-                </CardTitle>
+                  Criar Novo
+                </Button>
               </CardHeader>
 
               {!loading && vehicles.length > 0 ? (

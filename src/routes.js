@@ -27,12 +27,13 @@ import Travel from "views/Travels";
 import ListVehicles from "views/ListVehicles";
 import Vehicle from "views/Vehicle";
 import TripStopList from "views/TripStopList";
+import { FaCarAlt } from "react-icons/fa";
 
 var routes = [
   {
     path: "dashboard",
     name: "Dashboard",
-    icon: "nc-icon nc-bank",
+    icon: <FaCarAlt />,
     component: <Dashboard />,
     layout: "/",
     display: true,
@@ -63,7 +64,7 @@ var routes = [
   {
     path: "add/driver/:id?",
     name: "Cadastro de Motoristas",
-    icon: "nc-icon nc-single-02",
+    icon: FaCarAlt,
     component: <Driver />,
     layout: "/",
     display: false,
@@ -71,7 +72,7 @@ var routes = [
   {
     path: "list/vehicles",
     name: "Veiculos",
-    icon: "nc-icon nc-single-02",
+    icon: FaCarAlt,
     component: <ListVehicles />,
     layout: "/",
     display: true,
@@ -79,7 +80,7 @@ var routes = [
   {
     path: "/vehicle",
     name: "Veiculos",
-    icon: "nc-icon nc-single-02",
+    icon: FaCarAlt,
     component: <Vehicle />,
     layout: "/",
     display: false,
@@ -87,7 +88,7 @@ var routes = [
   {
     path: "add/route/id?",
     name: "Rotas",
-    icon: "nc-icon nc-single-02",
+    icon: FaCarAlt,
     component: <RoutePage />,
     layout: "/",
     display: false,
@@ -95,7 +96,7 @@ var routes = [
   {
     path: "routes",
     name: "Rotas",
-    icon: "nc-icon nc-single-02",
+    icon: FaCarAlt,
     component: <RouteList />,
     layout: "/",
     display: true,
@@ -103,7 +104,7 @@ var routes = [
   {
     path: "travel",
     name: "Viagens",
-    icon: "nc-icon nc-single-02",
+    icon: FaCarAlt,
     component: <TravelList />,
     layout: "/",
     display: true,
@@ -111,7 +112,7 @@ var routes = [
   {
     path: "add/travel/:id?",
     name: "Viagens",
-    icon: "nc-icon nc-single-02",
+    icon: FaCarAlt,
     component: <Travel />,
     layout: "/",
     display: false,
@@ -119,7 +120,7 @@ var routes = [
   {
     path: "drivers",
     name: "Motoristas",
-    icon: "nc-icon nc-tile-56",
+    icon: FaCarAlt,
     component: <DriverList />,
     layout: "/",
     display: true,
@@ -127,7 +128,7 @@ var routes = [
   {
     path: "tripstop",
     name: "Paradas",
-    icon: "nc-icon nc-tile-56",
+    icon: FaCarAlt,
     component: <TripStopList />,
     layout: "/",
     display: true,
