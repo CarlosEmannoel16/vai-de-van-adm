@@ -34,6 +34,8 @@ import { Loader } from "components/Loader/Loader";
 import { Paginations } from "components/Pagination/Pagination";
 
 function Tables() {
+  const navigate = useNavigate();
+
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState([]);
 
@@ -54,8 +56,6 @@ function Tables() {
     }
   }, [drivers]);
 
-  const navigate = useNavigate();
-
   return (
     <>
       <div className="content">
@@ -71,7 +71,14 @@ function Tables() {
               >
                 <CardTitle tag="h4">Motoristas</CardTitle>
 
-                <Button>Criar Novo</Button>
+                <Button
+                  onClick={(e) => {
+                    console.log(e);
+                    navigate(`/add/driver`);
+                  }}
+                >
+                  Criar Novo
+                </Button>
               </CardHeader>
 
               {!loading && drivers.length > 0 ? (

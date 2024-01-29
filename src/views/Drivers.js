@@ -17,10 +17,11 @@
 
 */
 import React, { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import "../assets/css/driver.css";
-// reactstrap components
+import { Row, Col, Grid } from "rsuite";
 import {
   Button,
   Card,
@@ -28,30 +29,24 @@ import {
   CardBody,
   CardTitle,
   FormGroup,
-  Form,
   Input,
-  Row,
-  Col,
   CardFooter,
   Label,
 } from "reactstrap";
 import { userService } from "services/driver";
-import * as Yup from "yup";
 import { Loader } from "components/Loader/Loader";
 import { formatDateToInputUpdate } from "../helpers/formatDateToDisplay";
 import profileM from "../assets/img/profile-m.jpg";
-import profileF from "../assets/img/profile-f.jpg";
-
 import capa from "../assets/img/jan-sendereks.jpg";
+
 function Driver() {
+  const { handleSubmit, control, setValue, reset, watch } = useForm();
+
   const [formSubmit, setFormSubmit] = useState({});
   const [driver, setDriver] = useState({});
-  const [isView, setIsView] = useState(false); // eslint-disable-line
   const [isUpdate, setIsUpdate] = useState(false); // eslint-disable-line
   const [loading, setLoading] = useState(false); // eslint-disable-line
-  const [imagePreviewUrl, setImagePreviewUrl] = useState(
-    "../assets/img/profile-m.jpg"
-  ); // eslint-disable-line
+
   const navigate = useNavigate();
   const id = useLocation().state;
 
@@ -98,23 +93,6 @@ function Driver() {
   const onSubmit = (e) => {
     try {
       e.preventDefault();
-      Yup.object({
-        name: Yup.string().required("Nome é obrigatório"),
-        email: Yup.string().required("Email é obrigatório"),
-        password: Yup.string().required("Senha é obrigatório"),
-        cpf: Yup.string().required("CPF é obrigatório"),
-        phone: Yup.string().required("Telefone é obrigatório"),
-        date_of_birth: Yup.string().required(
-          "Data de Nascimento é obrigatório"
-        ),
-        cnh: Yup.string().required("CNH é obrigatório"),
-        cnhDateOfIssue: Yup.string().required(
-          "Data de Emissão da CNH é obrigatório"
-        ),
-        cnhExpirationDate: Yup.string().required(
-          "Data de Validade da CNH é obrigatório"
-        ),
-      }).validateSync(formSubmit, { abortEarly: true });
 
       if (!id) {
         userService.create(formSubmit).then((res) => {
@@ -142,15 +120,9 @@ function Driver() {
         {loading ? (
           <Loader />
         ) : (
-          <Form onSubmit={onSubmit}>
-            <Row>
-              <Col
-                md="4"
-                style={{
-                  transition: "0.5s",
-                  display: `block`,
-                }}
-              >
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Row className="show-grid">
+              <Col xs={8}>
                 <Card
                   className="card-user"
                   style={{
@@ -161,31 +133,33 @@ function Driver() {
                     <img alt="..." src={capa} />
                   </div>
                   <CardBody>
-                    <div className="author">
-                      <label for="profileImage">
-                        <img
-                          alt="..."
-                          className="avatar profileImageLabel profileImage"
-                          src={profileM}
+                    <Grid fluid>
+                      <div className="author">
+                        <label for="profileImage">
+                          <img
+                            alt="..."
+                            className="avatar profileImageLabel profileImage"
+                            src={profileM}
+                          />
+                        </label>
+                        <input
+                          type="file"
+                          id="profileImage"
+                          style={{
+                            display: "none",
+                          }}
+                          onChange={(e) => {
+                            uploadProfileImage(e.target.files[0]);
+                          }}
                         />
-                      </label>
-                      <input
-                        type="file"
-                        id="profileImage"
-                        style={{
-                          display: "none",
-                        }}
-                        onChange={(e) => {
-                          uploadProfileImage(e.target.files[0]);
-                        }}
-                      />
-                    </div>
-                    <h5 className="title">{formSubmit.name || ""}</h5>
-                    <p className="description">{formSubmit.email || ""}</p>
+                      </div>
+                      <h5 className="title">{formSubmit.name || ""}</h5>
+                      <p className="description">{formSubmit.email || ""}</p>
 
-                    <p className="description text-center">
-                      {formSubmit.phone || ""}
-                    </p>
+                      <p className="description text-center">
+                        {formSubmit.phone || ""}
+                      </p>
+                    </Grid>
                   </CardBody>
                   <CardFooter>
                     <hr />
@@ -193,7 +167,7 @@ function Driver() {
 
                     {!!id ? (
                       <div className="button-container">
-                        <Row>
+                        <Row className="show-grid">
                           <Col className="ml-auto" lg="6" md="6" xs="6">
                             <h5>
                               {driver?.Vehicle?.length || 0} <br />
@@ -210,7 +184,6 @@ function Driver() {
                       </div>
                     ) : (
                       <>
-                        {" "}
                         <br /> <br />
                       </>
                     )}
@@ -218,7 +191,7 @@ function Driver() {
                 </Card>
               </Col>
 
-              <Col md={"8"}>
+              <Col md={16}>
                 <Card className="card-user">
                   <CardHeader>
                     <CardTitle tag="h5">
@@ -228,194 +201,206 @@ function Driver() {
                     </CardTitle>
                   </CardHeader>
                   <CardBody>
-                    <Row>
-                      <Col className="pr-1" md="5">
-                        <FormGroup>
-                          <label>Nome*</label>
-                          <Input
-                            placeholder="Nome"
-                            value={formSubmit.name || ""}
-                            type="text"
-                            onChange={(e) => {
-                              setFormSubmit({
-                                ...formSubmit,
-                                name: e.target.value,
-                              });
-                            }}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="pl-1" md="4">
-                        <FormGroup>
-                          <label htmlFor="exampleInputEmail1">Email*</label>
-                          <Input
-                            placeholder="Email"
-                            type="email"
-                            value={formSubmit.email || ""}
-                            onChange={(e) => {
-                              setFormSubmit({
-                                ...formSubmit,
-                                email: e.target.value,
-                              });
-                            }}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="px-1" md="3">
-                        <FormGroup>
-                          <label>Senha*</label>
-                          <Input
-                            placeholder="Senha"
-                            type="password"
-                            value={formSubmit.password || ""}
-                            onChange={(e) => {
-                              setFormSubmit({
-                                ...formSubmit,
-                                password: e.target.value,
-                              });
-                            }}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col className="pr-1" md="6">
-                        <FormGroup>
-                          <label>CPF*</label>
-                          <Input
-                            placeholder="09878912343"
-                            type="text"
-                            value={formSubmit.cpf || ""}
-                            onChange={(e) => {
-                              setFormSubmit({
-                                ...formSubmit,
-                                cpf: e.target.value,
-                              });
-                            }}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="pl-1" md="6">
-                        <FormGroup>
-                          <label>Telefone</label>
-                          <Input
-                            placeholder="88997017654"
-                            type="text"
-                            value={formSubmit.phone || ""}
-                            onChange={(e) => {
-                              setFormSubmit({
-                                ...formSubmit,
-                                phone: e.target.value,
-                              });
-                            }}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col className="pr-1" md="4">
-                        <FormGroup>
-                          <label>Data de Nascimento</label>
-                          <Input
-                            type="date"
-                            defaultValue={formatDateToInputUpdate(
-                              driver?.date_of_birth || new Date().toISOString()
+                    <Grid fluid>
+                      <Row className="show-grid">
+                        <Col xs={8}>
+                          <Controller
+                            name="name"
+                            control={control}
+                            render={({ field }) => (
+                              <div className="verticalDirection">
+                                <label>Nome</label>
+                                <Input
+                                  size="lg"
+                                  defaultValue={field.value}
+                                  placeholder="Nome do Motorista"
+                                  onChange={(e) => setValue(field.name, e)}
+                                />
+                              </div>
                             )}
-                            onChange={(e) => {
-                              setFormSubmit({
-                                ...formSubmit,
-                                date_of_birth: e.target.value,
-                              });
-                            }}
                           />
-                        </FormGroup>
-                      </Col>
-                      <Col className="px-1" md="4">
-                        <FormGroup>
-                          <Label for="exampleSelect">Sexo</Label>
-                          <Input id="exampleSelect" name="select" type="select">
-                            <option>Selecionar</option>
-                            <option>Masculino</option>
-                            <option>Feminino</option>
-                            <option> Não binário </option>
-                          </Input>
-                        </FormGroup>
-                      </Col>
-                    </Row>
+                        </Col>
+                        <Col xs={8}>
+                          <Controller
+                            name="email"
+                            control={control}
+                            render={({ field }) => (
+                              <div className="verticalDirection">
+                                <label>Email</label>
+                                <Input
+                                  type="email"
+                                  size="lg"
+                                  defaultValue={field.value}
+                                  placeholder="Email do Motorista"
+                                  onChange={(e) => setValue(field.name, e)}
+                                />
+                              </div>
+                            )}
+                          />
+                        </Col>
+                        <Col xs={8}>
+                          <Controller
+                            name="password"
+                            control={control}
+                            render={({ field }) => (
+                              <div className="verticalDirection">
+                                <label>Senha</label>
+                                <Input
+                                  type="password"
+                                  size="lg"
+                                  defaultValue={field.value}
+                                  placeholder="Senha de acesso"
+                                  onChange={(e) => setValue(field.name, e)}
+                                />
+                              </div>
+                            )}
+                          />
+                        </Col>
+                      </Row>
+                      <Row className="show-grid">
+                        <Col xs={8}>
+                          <FormGroup>
+                            <label>CPF*</label>
+                            <Input
+                              placeholder="09878912343"
+                              type="text"
+                              value={formSubmit.cpf || ""}
+                              onChange={(e) => {
+                                setFormSubmit({
+                                  ...formSubmit,
+                                  cpf: e.target.value,
+                                });
+                              }}
+                            />
+                          </FormGroup>
+                        </Col>
+                        <Col xs={8}>
+                          <FormGroup>
+                            <label>Telefone</label>
+                            <Input
+                              placeholder="88997017654"
+                              type="text"
+                              value={formSubmit.phone || ""}
+                              onChange={(e) => {
+                                setFormSubmit({
+                                  ...formSubmit,
+                                  phone: e.target.value,
+                                });
+                              }}
+                            />
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                      <Row className="show-grid">
+                        <Col xs={8}>
+                          <FormGroup>
+                            <label>Data de Nascimento</label>
+                            <Input
+                              type="date"
+                              defaultValue={formatDateToInputUpdate(
+                                driver?.date_of_birth ||
+                                  new Date().toISOString()
+                              )}
+                              onChange={(e) => {
+                                setFormSubmit({
+                                  ...formSubmit,
+                                  date_of_birth: e.target.value,
+                                });
+                              }}
+                            />
+                          </FormGroup>
+                        </Col>
+                        <Col xs={8}>
+                          <FormGroup>
+                            <Label for="exampleSelect">Sexo</Label>
+                            <Input
+                              id="exampleSelect"
+                              name="select"
+                              type="select"
+                            >
+                              <option>Selecionar</option>
+                              <option>Masculino</option>
+                              <option>Feminino</option>
+                              <option> Não binário </option>
+                            </Input>
+                          </FormGroup>
+                        </Col>
+                      </Row>
 
-                    <hr />
-                    <Row>
-                      <Col className="pr-1" md="4">
-                        <FormGroup>
-                          <label>CNH</label>
-                          <Input
-                            placeholder=""
-                            type="text"
-                            value={formSubmit.cnh || ""}
-                            onChange={(e) => {
-                              setFormSubmit({
-                                ...formSubmit,
-                                cnh: e.target.value,
-                              });
-                            }}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="px-1" md="4">
-                        <FormGroup>
-                          <label>Data de Emissao*</label>
-                          <Input
-                            type="date"
-                            defaultValue={formatDateToInputUpdate(
-                              formSubmit?.cnhDateOfIssue ||
-                                new Date().toISOString()
-                            )}
-                            onChange={(e) => {
-                              setFormSubmit({
-                                ...formSubmit,
-                                cnhDateOfIssue: e.target.value,
-                              });
-                            }}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="pl-1" md="4">
-                        <FormGroup>
-                          <label>Data de Validade*</label>
-                          <Input
-                            type="date"
-                            defaultValue={formatDateToInputUpdate(
-                              formSubmit?.cnhExpirationDate ||
-                                new Date().toISOString()
-                            )}
-                            onChange={(e) => {
-                              setFormSubmit({
-                                ...formSubmit,
-                                cnhExpirationDate: e.target.value,
-                              });
-                            }}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row></Row>
-                    <Row>
-                      <div className="update ml-auto mr-auto">
-                        <Button
-                          className="btn-round"
-                          color="primary"
-                          type="submit"
-                          disabled={loading}
-                        >
-                          {isUpdate ? "Atualizar" : "Adicionar"}
-                        </Button>
-                      </div>
-                    </Row>
+                      <hr />
+                      <Row className="show-grid">
+                        <Col xs={8}>
+                          <FormGroup>
+                            <label>CNH</label>
+                            <Input
+                              placeholder=""
+                              type="text"
+                              value={formSubmit.cnh || ""}
+                              onChange={(e) => {
+                                setFormSubmit({
+                                  ...formSubmit,
+                                  cnh: e.target.value,
+                                });
+                              }}
+                            />
+                          </FormGroup>
+                        </Col>
+                        <Col xs={8}>
+                          <FormGroup>
+                            <label>Data de Emissao*</label>
+                            <Input
+                              type="date"
+                              defaultValue={formatDateToInputUpdate(
+                                formSubmit?.cnhDateOfIssue ||
+                                  new Date().toISOString()
+                              )}
+                              onChange={(e) => {
+                                setFormSubmit({
+                                  ...formSubmit,
+                                  cnhDateOfIssue: e.target.value,
+                                });
+                              }}
+                            />
+                          </FormGroup>
+                        </Col>
+                        <Col xs={8}>
+                          <FormGroup>
+                            <label>Data de Validade*</label>
+                            <Input
+                              type="date"
+                              defaultValue={formatDateToInputUpdate(
+                                formSubmit?.cnhExpirationDate ||
+                                  new Date().toISOString()
+                              )}
+                              onChange={(e) => {
+                                setFormSubmit({
+                                  ...formSubmit,
+                                  cnhExpirationDate: e.target.value,
+                                });
+                              }}
+                            />
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                      <Row className="show-grid"></Row>
+                      <Row className="show-grid">
+                        <div className="update ml-auto mr-auto">
+                          <Button
+                            className="btn-round"
+                            color="primary"
+                            type="submit"
+                            disabled={loading}
+                          >
+                            {isUpdate ? "Atualizar" : "Adicionar"}
+                          </Button>
+                        </div>
+                      </Row>
+                    </Grid>
                   </CardBody>
                 </Card>
               </Col>
             </Row>
-          </Form>
+          </form>
         )}
       </div>
     </>
