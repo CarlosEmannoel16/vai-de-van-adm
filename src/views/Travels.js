@@ -16,8 +16,10 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
+import "../index.css";
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { Input, DatePicker, Row, Col, Grid } from "rsuite";
 
 import {
   Button,
@@ -25,10 +27,6 @@ import {
   CardHeader,
   CardBody,
   CardTitle,
-  FormGroup,
-  Input,
-  Row,
-  Col,
   Label,
 } from "reactstrap";
 
@@ -41,11 +39,12 @@ import { routerService } from "services/routers";
 import { serviceVehicles } from "services/vehicle";
 import { useLocation, useNavigate } from "react-router-dom";
 import { validateCreateTravel } from "./validations/TravelValidaton";
+import { Select } from "components/Select";
 
 function Travel() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { handleSubmit, control, setValue, reset } = useForm();
+  const { handleSubmit, control, setValue, reset, watch } = useForm();
 
   const [routes, setRoutes] = useState([]);
   const [cities, setCities] = useState([]);
@@ -73,22 +72,28 @@ function Travel() {
   }, [location?.state?.travel, reset]);
 
   const onSubmit = async (data) => {
-    setLoading(true);
-    await validateCreateTravel(data);
+    try {
+      console.log("DATA", data);
+      setLoading(true);
+      await validateCreateTravel(data);
 
-    if (!isUpdate) await handleCreateNewTravel(data);
-    else await handleUpdateTravel(data);
+      if (!isUpdate) await handleCreateNewTravel(data);
+      else await handleUpdateTravel(data);
 
-    setLoading(false);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      toast.error(error.message);
+    }
   };
 
   const handleCreateNewTravel = async (data) => {
     try {
-      travelService.create({ ...data });
+      console.log("DATA", data);
+      await travelService.create({ ...data });
       toast.success("Viagem cadastrada com sucesso!");
       navigate("/travel");
     } catch (error) {
-      setLoading(false);
       toast.error(error.message);
     }
   };
@@ -99,7 +104,6 @@ function Travel() {
       toast.success("Viagem atualizada com sucesso!");
       navigate("/travel");
     } catch (error) {
-      setLoading(false);
       toast.error(error.message);
     }
   };
@@ -117,6 +121,8 @@ function Travel() {
     setLoading(false);
   };
 
+  console.log(watch("name"));
+
   useState(() => {
     if (!routes.length && !cities.length) {
       getAllData();
@@ -133,196 +139,145 @@ function Travel() {
             </CardTitle>
           </CardHeader>
           <CardBody>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <Row>
-                <Col className="pr-1" md="5">
-                  <Controller
-                    name="name"
-                    control={control}
-                    render={({ field }) => (
-                      <FormGroup>
-                        <label>Nome</label>
-                        <Input
-                          defaultValue={field.value}
-                          placeholder="Descricao da Viagem"
-                          onChange={(e) => setValue}
-                          type="text"
-                        />
-                      </FormGroup>
-                    )}
-                  />
-                </Col>
-                <Col className="px-1" md="3">
-                  <Controller
-                    control={control}
-                    name="idRoute"
-                    render={({ field }) => (
-                      <FormGroup>
-                        <Label for="exampleSelect">Rota</Label>
-                        <Input
-                          id="idRoute"
-                          name="idRoute"
-                          type="select"
-                          defaultValue={field.value}
-                          onChange={(e) => setValue}
-                        >
-                          <option key={897986} defaultChecked>
-                            Selecionar Uma Rota
-                          </option>
-                          {routes.length &&
-                            routes.map((route, index) => (
-                              <option
-                                key={index}
-                                value={JSON.stringify(route)}
-                                defaultChecked={route.id === field.value}
-                              >
-                                {route.name}
-                              </option>
-                            ))}
-                        </Input>
-                      </FormGroup>
-                    )}
-                  />
-                </Col>
-                <Col className="px-1" md="3">
-                  <Controller
-                    control={control}
-                    name="driverId"
-                    render={({ field }) => (
-                      <FormGroup>
-                        <Label for="exampleSelect">Motorista</Label>
-                        <Input
-                          id="driverId"
-                          name="driverId"
-                          type="select"
-                          placeholder="Digite o Nome do Motorista"
-                          defaultValue={field.value}
-                          onChange={(e) => setValue}
-                        >
-                          <option key={897986} value={field.value}>
-                            Selecionar Um Motorista
-                          </option>
-                          {drivers.length &&
-                            drivers.map((driver) => {
-                              return (
-                                <option
-                                  value={driver.id}
-                                  defaultChecked={driver.id === field.value}
-                                >
-                                  {driver.name}
-                                </option>
-                              );
-                            })}
-                        </Input>
-                      </FormGroup>
-                    )}
-                  />
-                </Col>
-              </Row>
-              <Row>
-                <Col className="pr-1" md="3">
-                  <Controller
-                    control={control}
-                    name="idVehicle"
-                    render={({ field }) => (
-                      <FormGroup>
-                        <Label for="exampleSelect">Veiculo</Label>
-                        <Input
-                          id="idVehicle"
-                          name="idVehicle"
-                          defaultValue={field.value}
-                          type="select"
-                          value={field.value}
-                          onChange={(e) => setValue}
-                        >
-                          <option key={897986} value={field.value}>
-                            {field.value || "Selecionar Um Veiculo"}
-                          </option>
-                          {vehicles.length &&
-                            vehicles.map((vehicleCurrent) => {
-                              return (
-                                <option value={vehicleCurrent.id}>
-                                  {vehicleCurrent.name}
-                                </option>
-                              );
-                            })}
-                        </Input>
-                      </FormGroup>
-                    )}
-                  />
-                </Col>
-                <Col className="px-1" md="3">
-                  <Controller
-                    control={control}
-                    name="departureDate"
-                    render={({ field }) => (
-                      <FormGroup>
-                        <Label for="exampleSelect">Data de Partida</Label>
-                        <Input
-                          id="departureDate"
-                          type="date"
-                          defaultValue={field.value
-                            ?.toString()
-                            ?.substring(0, 10)}
-                          onChange={(e) => setValue}
-                        ></Input>
-                      </FormGroup>
-                    )}
-                  />
-                </Col>
-                <Col className="px-1" md="3">
-                  <Controller
-                    control={control}
-                    name="arrivalDate"
-                    render={({ field }) => (
-                      <FormGroup>
-                        <Label for="exampleSelect">Data de Chegada</Label>
-                        <Input
-                          id="arrivalDate"
-                          type="date"
-                          defaultValue={field.value
-                            ?.toString()
-                            ?.substring(0, 10)}
-                          onChange={(e) => setValue}
-                        ></Input>
-                      </FormGroup>
-                    )}
-                  />
-                </Col>
-                <Col className="px-1" md="3">
-                  <Controller
-                    name="recurrentTravel"
-                    control={control}
-                    render={({ field }) => (
-                      <FormGroup>
-                        <Label for="exampleSelect">Viagem Recorrente</Label>
-                        <Input
-                          id="arrivalDate"
-                          type="date"
-                          defaultValue={field.value
-                            ?.toString()
-                            ?.substring(0, 10)}
-                          onChange={(e) => setValue}
-                        ></Input>
-                      </FormGroup>
-                    )}
-                  />
-                </Col>
-              </Row>
+            <Grid fluid>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <Row className="show-grid">
+                  <Col xs={8}>
+                    <Controller
+                      name="description"
+                      control={control}
+                      render={({ field }) => (
+                        <div className="verticalDirection">
+                          <label>Nome</label>
+                          <Input
+                            name="description"
+                            size="lg"
+                            defaultValue={field.value}
+                            placeholder="Descricao da Viagem"
+                            onChange={(e) => setValue(field.name, e)}
+                          />
+                        </div>
+                      )}
+                    />
+                  </Col>
+                  <Col xs={8}>
+                    <Controller
+                      control={control}
+                      name="idRoute"
+                      render={({ field }) => (
+                        <div className="verticalDirection">
+                          <Label for="exampleSelect">Rota</Label>
+                          <Select
+                            defaultValue={field.value}
+                            data={routes.map((route) => ({
+                              label: route.name,
+                              value: route.id,
+                            }))}
+                            onChange={(e) => setValue(field.name, e)}
+                            placeholder="Selecione uma Rota"
+                          />
+                        </div>
+                      )}
+                    />
+                  </Col>
+                  <Col xs={8}>
+                    <Controller
+                      control={control}
+                      name="driverId"
+                      render={({ field }) => (
+                        <>
+                          <Label for="exampleSelect">Motorista</Label>
+                          <Select
+                            defaultValue={field.value}
+                            data={drivers.map((driver) => ({
+                              label: driver.name,
+                              value: driver.id,
+                            }))}
+                            onChange={(e) => setValue(field.name, e)}
+                            placeholder="Selecione um Motorista"
+                          />
+                        </>
+                      )}
+                    />
+                  </Col>
+                </Row>
+                <Row className="show-grid">
+                  <Col xs={8}>
+                    <Controller
+                      control={control}
+                      name="idVehicle"
+                      render={({ field }) => (
+                        <>
+                          <Label for="exampleSelect">Veiculo</Label>
+                          <Select
+                            defaultValue={field.value}
+                            data={vehicles.map((vehicle) => ({
+                              label: vehicle.name,
+                              value: vehicle.id,
+                            }))}
+                            onChange={(e) => setValue(field.name, e)}
+                            placeholder="Selecione um Veiculo"
+                          />
+                        </>
+                      )}
+                    />
+                  </Col>
+                  <Col xs={8}>
+                    <Controller
+                      control={control}
+                      name="departureDate"
+                      render={({ field }) => (
+                        <div className="verticalDirection">
+                          <Label for="exampleSelect">Data de Partida</Label>
+                          <DatePicker
+                            format="dd/MM/yyyy"
+                            defaultValue={new Date(field.value) || new Date()}
+                            onChange={(e) => {
+                              setValue(field.name, new Date(e).toISOString());
+                            }}
+                            name="departureDate"
+                            size="lg"
+                            placeholder="Data de Partida"
+                          />
+                        </div>
+                      )}
+                    />
+                  </Col>
+                  <Col xs={8}>
+                    <Controller
+                      control={control}
+                      name="arrivalDate"
+                      render={({ field }) => (
+                        <div className="verticalDirection">
+                          <Label for="exampleSelect">Data de Chegada</Label>
+                          <DatePicker
+                            format="dd/MM/yyyy"
+                            placeholder="Data de Chegada"
+                            defaultValue={field.value || new Date()}
+                            onChange={(e) => setValue(field.name, new Date(e))}
+                            name="arrivalDate"
+                            size="lg"
+                          />
+                        </div>
+                      )}
+                    />
+                  </Col>
+                </Row>
 
-              <Row>
-                <div className="update ml-auto mr-auto">
-                  <Button
-                    className="btn-round"
-                    color="primary"
-                    type="submit"
-                    disabled={loading}
-                  >
-                    Salvar
-                  </Button>
-                </div>
-              </Row>
-            </form>
+                <Row className="show-grid">
+                  <div className="update ml-auto mr-auto">
+                    <Button
+                      className="btn-round"
+                      color="primary"
+                      type="submit"
+                      disabled={loading}
+                    >
+                      Salvar
+                    </Button>
+                  </div>
+                </Row>
+              </form>
+            </Grid>
           </CardBody>
         </Card>
       </div>

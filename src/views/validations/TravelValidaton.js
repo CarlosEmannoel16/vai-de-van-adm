@@ -9,7 +9,7 @@ export const validateCreateTravel = async (data) => {
       description: yup.string().required("Descrição é obrigatório"),
       driverId: yup.string().required("Motorista é obrigatório"),
       idVehicle: yup.string().required("Veiculo é obrigatório"),
-      routeId: yup.string().required("Rota é obrigatório"),
+      idRoute: yup.string().required("Rota é obrigatório"),
     })
     .validate(data, {
       abortEarly: true,
