@@ -6,17 +6,45 @@ import { Button, Card, CardHeader, CardBody, CardTitle } from "reactstrap";
 import { cityService } from "services/city";
 import { routerService } from "services/routers";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Col, Grid, Row } from "rsuite";
+import { Col, Grid, Row, Steps } from "rsuite";
 import { InputText } from "components/input";
 import { Select } from "components/Select";
-import { TimelineRoute } from "components/timeline";
-import { DndContext } from "@dnd-kit/core";
+
+const styles = {
+  width: "200px",
+  display: "inline-table",
+  verticalAlign: "top",
+};
 
 function Route() {
   const [cities, setCities] = React.useState([]);
   const [ticketValue, setTicketValue] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [formSubmit, setFormSubmit] = useState({});
+
+  const tripStops = [
+    {
+      id: 1,
+      name: "Parada 1",
+      order: 1,
+      isInitial: true,
+      ifFinal: false,
+    },
+    {
+      id: 2,
+      name: "Parada 2",
+      order: 1,
+      isInitial: true,
+      ifFinal: false,
+    },
+    {
+      id: 3,
+      name: "Parada 3",
+      order: 1,
+      isInitial: true,
+      ifFinal: false,
+    },
+  ];
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -179,6 +207,15 @@ function Route() {
                       : "Adicionar Nova Rota"}
                   </Button>
                 </div>
+              </Row>
+              <Row>
+                <Steps current={1} vertical style={styles}>
+                  <Steps.Item title="1" />
+                  <Steps.Item title="2" />
+                </Steps>
+              </Row>
+              <Row>
+                <Button>Adicionar parada</Button>
               </Row>
             </Grid>
           </CardBody>
