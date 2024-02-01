@@ -222,7 +222,7 @@ function Travel() {
                       )}
                     />
                   </Col>
-                  <Col xs={8}>
+                  <Col xs={4}>
                     <Controller
                       control={control}
                       name="departureDate"
@@ -244,7 +244,29 @@ function Travel() {
                       )}
                     />
                   </Col>
-                  <Col xs={8}>
+                  <Col xs={4}>
+                    <Controller
+                      control={control}
+                      name="departureDate"
+                      render={({ field }) => (
+                        <div className="verticalDirection">
+                          <Label for="exampleSelect">Horário da partida</Label>
+                          <DatePicker
+                            format="HH:mm:ss"
+                            defaultValue={new Date()}
+                            onChange={(e) => {
+                              new Date(e).toISOString();
+                              setValue(field.name, new Date(e).toISOString());
+                            }}
+                            name="departureDateHour"
+                            size="lg"
+                            placeholder="Horário da partida"
+                          />
+                        </div>
+                      )}
+                    />
+                  </Col>
+                  <Col xs={4}>
                     <Controller
                       control={control}
                       name="arrivalDate"
@@ -259,6 +281,27 @@ function Travel() {
                               setValue(field.name, new Date(e).toISOString())
                             }
                             name="arrivalDate"
+                            size="lg"
+                          />
+                        </div>
+                      )}
+                    />
+                  </Col>
+                  <Col xs={4}>
+                    <Controller
+                      control={control}
+                      name="arrivalDate"
+                      render={({ field }) => (
+                        <div className="verticalDirection">
+                          <Label for="exampleSelect">Horário de Chegada</Label>
+                          <DatePicker
+                            format="HH:mm:ss"
+                            placeholder="Data de Chegada"
+                            defaultValue={new Date()}
+                            onChange={(e) =>
+                              setValue(field.name, new Date(e).toISOString())
+                            }
+                            name="arrivalDateHour"
                             size="lg"
                           />
                         </div>
