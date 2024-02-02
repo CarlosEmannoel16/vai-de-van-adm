@@ -57,6 +57,7 @@ function Travel() {
     setLoading(true);
     const data = location?.state?.travel;
     if (data && Object.keys(data).length) {
+      console.log("DATA===>", data);
       setIsUpdate(true);
       reset({
         recurrentTravel: data?.recurrentTravel,
@@ -65,7 +66,7 @@ function Travel() {
         idVehicle: data?.vehicleId,
         driverId: data?.driverId,
         idRoute: data?.routeId,
-        name: data?.name,
+        description: data?.description,
       });
     }
     setLoading(false);
@@ -152,6 +153,7 @@ function Travel() {
                           <Input
                             name="description"
                             size="lg"
+                            value={field.value}
                             defaultValue={field.value}
                             placeholder="Descricao da Viagem"
                             onChange={(e) => setValue(field.name, e)}
@@ -169,6 +171,7 @@ function Travel() {
                           <Label for="exampleSelect">Rota</Label>
                           <Select
                             defaultValue={field.value}
+                            value={field.value}
                             data={routes.map((route) => ({
                               label: route.name,
                               value: route.id,
@@ -188,6 +191,7 @@ function Travel() {
                         <>
                           <Label for="exampleSelect">Motorista</Label>
                           <Select
+                            value={field.value}
                             defaultValue={field.value}
                             data={drivers.map((driver) => ({
                               label: driver.name,
@@ -202,7 +206,7 @@ function Travel() {
                   </Col>
                 </Row>
                 <Row className="show-grid">
-                  <Col xs={8}>
+                  <Col xs={4}>
                     <Controller
                       control={control}
                       name="idVehicle"
@@ -211,6 +215,7 @@ function Travel() {
                           <Label for="exampleSelect">Veiculo</Label>
                           <Select
                             defaultValue={field.value}
+                            value={field.value}
                             data={vehicles.map((vehicle) => ({
                               label: vehicle.name,
                               value: vehicle.id,
@@ -305,6 +310,27 @@ function Travel() {
                             size="lg"
                           />
                         </div>
+                      )}
+                    />
+                  </Col>
+                  <Col xs={4}>
+                    <Controller
+                      control={control}
+                      name="idVehicle"
+                      render={({ field }) => (
+                        <>
+                          <Label for="exampleSelect">Veiculo</Label>
+                          <Select
+                            defaultValue={field.value}
+                            value={field.value}
+                            data={vehicles.map((vehicle) => ({
+                              label: vehicle.name,
+                              value: vehicle.id,
+                            }))}
+                            onChange={(e) => setValue(field.name, e)}
+                            placeholder="Selecione um Veiculo"
+                          />
+                        </>
                       )}
                     />
                   </Col>

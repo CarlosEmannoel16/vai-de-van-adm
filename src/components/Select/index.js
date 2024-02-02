@@ -12,6 +12,7 @@ export const Select = ({
     <SelectPicker
       defaultValue={defaultValue}
       size={size}
+      value={value}
       placeholder={placeholder}
       data={data}
       style={{ width: "100%" }}
